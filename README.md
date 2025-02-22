@@ -4,7 +4,7 @@ Tool that allows the modification of script files offered in ANIM and CROWD powe
 ### Notes on its usage
 1. When extracting a script file, a `(originalname)_sce_metadata.dat` file will be generated. Said file contains the header of the original file (minus the 4 bytes magic signature and the 16 bytes key) intact. This is because that part is still yet to be understood and is mandatory for recreating the script file.
 2. The tool has only been tested (and will NOT be tested with other games) with [Zetsuboushi](https://vndb.org/v3315). Still, pull requests will be accepted and tested to see if they work correctly.
-3. The program will decrypt any *_define.dat file, but it will not convert it to a human readable format, is it may vary a bit between games, and not something I intend on tackling myself.
+3. The program will decrypt any *_define.dat file, but it will not convert it to a human readable format, as it may vary a bit between games, and not something I intend on tackling myself.
 
 ### How are *_sce.dat and *_define.dat files structured?
 While the code also documents how these files are structured, here it is also the same information on a more accessible manner.
