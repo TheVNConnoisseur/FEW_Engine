@@ -190,6 +190,233 @@ namespace FEW_Engine
                             currentOffset++;
                             break;
                         }
+                    case 0x19:
+                        {
+                            instruction.Type = "FlagAdd";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x1A:
+                        {
+                            instruction.Type = "FlagSub";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x1B:
+                        {
+                            instruction.Type = "FlagMul";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x1C:
+                        {
+                            instruction.Type = "FlagDiv";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x1D:
+                        {
+                            instruction.Type = "FlagExc";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x1E:
+                        {
+                            instruction.Type = "FlagSet";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x31:
+                        {
+                            instruction.Type = "F2FAdd";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x32:
+                        {
+                            instruction.Type = "F2FSub";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x33:
+                        {
+                            instruction.Type = "F2FMul";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x34:
+                        {
+                            instruction.Type = "F2FDiv";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x35:
+                        {
+                            instruction.Type = "F2FExc";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x36:
+                        {
+                            instruction.Type = "F2FSet";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x37:
+                        {
+                            instruction.Type = "F2FRand";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+
+                            argumentArray.Initialize();
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[2] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            break;
+                        }
                     case 0x47:
                         {
                             instruction.Type = "CgFullClear"; //or CFC
@@ -222,6 +449,24 @@ namespace FEW_Engine
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
                             }
                             currentOffset += 8;
+
+                            break;
+                        }
+                    case 0x4C:
+                        {
+                            instruction.Type = "GetMiddlePos"; //or GetMidPos, GMPos
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                   Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
 
                             break;
                         }
@@ -350,6 +595,20 @@ namespace FEW_Engine
                             currentOffset += 7;
                             break;
                         }
+                    case 0x7D:
+                        {
+                            instruction.Type = "SetMepachiTime"; //or SMTIME
+                            currentOffset++;
+
+                            for (int currentArgument = 0; currentArgument < 3; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                            }
+                            currentOffset += 12;
+
+                            break;
+                        }
                     case 0x7E:
                         {
                             instruction.Type = "EventInit";
@@ -418,19 +677,6 @@ namespace FEW_Engine
                             currentOffset += 17;
                             break;
                         }
-                    // NOT DONE case 0x8E:
-                        {
-                            instruction.Type = "TextOut";
-
-                            for (int currentArgument = 0; currentArgument < 4; currentArgument++)
-                            {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
-                            }
-                            currentOffset += 17;
-
-                            break;
-                        }
                     case 0x8F:
                         {
                             instruction.Type = "TextOutDefault"; //or TOD
@@ -453,6 +699,60 @@ namespace FEW_Engine
                         {
                             instruction.Type = "TextDrawDefault"; //or TDD
                             currentOffset++;
+                            break;
+                        }
+                    case 0x94:
+                        {
+                            instruction.Type = "CgUnLoad";
+                            instruction.Arguments[0] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1));
+                            currentOffset += 5;
+                            break;
+                        }
+                    case 0x95:
+                        {
+                            instruction.Type = "CgDrawInit";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x96:
+                        {
+                            instruction.Type = "CgInitRect";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 4; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x97:
+                        {
+                            instruction.Type = "CgDraw";
+                            instruction.Arguments[0] =
+                                    Convert.ToString(Data[currentOffset + 1]);
+                            currentOffset += 2;
+                            break;
+                        }
+                    case 0x98:
+                        {
+                            instruction.Type = "CgShow";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 4; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
                             break;
                         }
                     case 0x9A:
