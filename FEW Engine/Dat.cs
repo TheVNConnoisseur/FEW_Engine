@@ -172,15 +172,43 @@ namespace FEW_Engine
 
                 switch(Data[currentOffset])
                 {
+                    case 0x2:
+                        {
+                            instruction.Type = "VideoStart"; //or VS, RecS
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                    Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
+                            break;
+                        }
+                    case 0x3:
+                        {
+                            instruction.Type = "VideoStartAnime"; //or VSA
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                    Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
+                            break;
+                        }
                     case 0x4:
                         {
                             instruction.Type = "VideoEnd"; //or VE
-                            currentOffset += 1;
+                            currentOffset++;
                             break;
                         }
                     case 0xD:
                         {
                             instruction.Type = "MacroEnd"; //or Return
+                            currentOffset++;
+                            break;
+                        }
+                    case 0xE:
+                        {
+                            instruction.Type = "SkipStop";
                             currentOffset++;
                             break;
                         }
@@ -295,6 +323,27 @@ namespace FEW_Engine
                             instruction.Arguments[1] =
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
                             currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x23:
+                        {
+                            instruction.Type = "FlagRand";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument + 1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                            }
+                            currentOffset += 8;
 
                             break;
                         }
@@ -426,9 +475,12 @@ namespace FEW_Engine
                     case 0x4A:
                         {
                             instruction.Type = "CgMidMove";
+                            currentOffset++;
+
                             instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset + 1]);
-                            currentOffset += 2;
+                                    Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
                             instruction.Arguments[1] =
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
                             currentOffset += 4;
@@ -438,10 +490,11 @@ namespace FEW_Engine
                     case 0x4B:
                         {
                             instruction.Type = "CgMidXY"; //or CMXY
+                            currentOffset++;
 
                             instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset + 1]);
-                            currentOffset += 2;
+                                    Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
@@ -473,65 +526,73 @@ namespace FEW_Engine
                     case 0x4D:
                         {
                             instruction.Type = "CgMidClear"; //or CMC
+                            currentOffset++;
+
                             instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset + 1]);
-                            currentOffset += 2;
+                                    Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
 
                             break;
                         }
                     case 0x4F:
                         {
                             instruction.Type = "CModeFlash";
+                            currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 7; currentArgument++)
                             {
                                 instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
                             }
-                            currentOffset += 29;
+                            currentOffset += 28;
                             break;
                         }
                     case 0x50:
                         {
                             instruction.Type = "EffectFlash"; //or EFF
+                            currentOffset++;
+
                             instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + 1));
-                            currentOffset += 3;
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            currentOffset += 2;
                             break;
                         }
                     case 0x51:
                         {
                             instruction.Type = "EffectShake";
+                            currentOffset++;
+
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
                                 instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + 1 + (currentArgument * 2)));
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + (currentArgument * 2)));
                             }
-                            currentOffset += 9;
+                            currentOffset += 8;
                             break;
                         }
                     case 0x55:
                         {
                             instruction.Type = "EffectEnvStop"; //or EFES
-                            currentOffset += 1;
+                            currentOffset++;
                             break;
                         }
                     case 0x56:
                         {
                             instruction.Type = "EffectEnvStopNoCreate"; //or EFESNC
-                            currentOffset += 1;
+                            currentOffset++;
                             break;
                         }
                     case 0x57:
                         {
                             instruction.Type = "ColorFill"; //or CFill
+                            currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 3; currentArgument++)
                             {
                                 instruction.Arguments[currentArgument] =
-                                    Convert.ToString(Data[currentOffset + 1 + currentArgument]);
+                                    Convert.ToString(Data[currentOffset + currentArgument]);
                             }
-                            currentOffset += 4;
+                            currentOffset += 3;
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
@@ -575,24 +636,217 @@ namespace FEW_Engine
                         {
                             instruction.Type = "EffectEnvLoadAlpha"; //or EFELA
                             currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x5A:
+                        {
+                            instruction.Type = "MusicPlay"; //or MP
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                    Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
+                            break;
+                        }
+                    case 0x5B:
+                        {
+                            instruction.Type = "MusicStop"; //or MM, MS
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x5C:
+                        {
+                            instruction.Type = "MusicStopFade"; //or MSF
+                            currentOffset++;
+
+                            instruction.Arguments[0] = 
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            currentOffset += 2;
                             break;
                         }
                     case 0x5E:
                         {
                             instruction.Type = "SoundEffectPlayLoop"; //or SEPL, WavePlayLoop, WPL
-                            int stringIndex = BitConverter.ToInt32(Data, currentOffset + 1);
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
                             instruction.Arguments[0] = strings[stringIndex];
-                            currentOffset += 5;
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x5F:
+                        {
+                            instruction.Type = "SoundEffectPlayLoopStop"; //or SEPLS, WaveStop, WS
+                            currentOffset++;
                             break;
                         }
                     case 0x60:
                         {
                             instruction.Type = "SoundEffectPlayLoopABCD"; //or SEPLAD
+                            currentOffset++;
+
                             instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + 1));
-                            int stringIndex = BitConverter.ToInt32(Data, currentOffset + 3);
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            currentOffset += 2;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
                             instruction.Arguments[1] = strings[stringIndex];
-                            currentOffset += 7;
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x61:
+                        {
+                            instruction.Type = "SoundEffectPlayLoopStopABCD"; //or SEPLSAD
+                            currentOffset++;
+
+                            instruction.Arguments[0] = 
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            currentOffset += 2;
+                            break;
+                        }
+                    case 0x62:
+                        {
+                            instruction.Type = "SoundEffectPlayLoopStopABCDALL"; //or SEPLSADALL
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x63:
+                        {
+                            instruction.Type = "SoundEffectPitch"; //or SETPITCH, SEPITCH
+                            currentOffset++;
+
+                            instruction.Arguments[0] = 
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x64:
+                        {
+                            instruction.Type = "SoundEffectPitchDefault"; //or SETPITCHD, SEPITCHD
+                            currentOffset++;
+
+                            instruction.Arguments[0] = 
+                                Convert.ToString( BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x69:
+                        {
+                            instruction.Type = "Sleep";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            break;
+                        }
+                    case 0x6A:
+                        {
+                            instruction.Type = "AnimeFullOn";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x6B:
+                        {
+                            instruction.Type = "AnimeFullOff";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x6C:
+                        {
+                            instruction.Type = "AnimeMepachiOn";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x6D:
+                        {
+                            instruction.Type = "AnimeMepachiOff";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x6E:
+                        {
+                            instruction.Type = "AnimeKutiOn";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x6F:
+                        {
+                            instruction.Type = "AnimeKutiOff";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x70:
+                        {
+                            instruction.Type = "FontSize";
+                            currentOffset++;
+
+                            instruction.Arguments[0] = Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
+                            break;
+                        }
+                    case 0x73:
+                        {
+                            instruction.Type = "FontReset";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x76:
+                        {
+                            instruction.Type = "PlayMovieRateSet";
+                            currentOffset++;
+
+                            instruction.Arguments[0] = Convert.ToString(
+                                BitConverter.ToInt16(Data, currentOffset));
+                            currentOffset += 2;
+
+                            instruction.Arguments[1] = Convert.ToString(
+                                BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x77:
+                        {
+                            instruction.Type = "PlayMoviePause";
+                            currentOffset++;
+
+                            instruction.Arguments[0] = Convert.ToString(
+                                BitConverter.ToInt16(Data, currentOffset));
+                            currentOffset += 2;
+                            break;
+                        }
+                    case 0x78:
+                        {
+                            instruction.Type = "ReleaseMovie";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x7B:
+                        {
+                            instruction.Type = "AntiAliasSet";
+                            currentOffset++;
+
+                            instruction.Arguments[0] = Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x7C:
+                        {
+                            instruction.Type = "MessageWindowSet";
+                            currentOffset++;
+
+                            instruction.Arguments[0] = Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
                             break;
                         }
                     case 0x7D:
@@ -618,13 +872,14 @@ namespace FEW_Engine
                     case 0x7F:
                         {
                             instruction.Type = "EventSet";
+                            currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 6; currentArgument++)
                             {
                                 instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
                             }
-                            currentOffset += 25;
+                            currentOffset += 24;
                             break;
                         }
                     case 0x80:
@@ -656,43 +911,50 @@ namespace FEW_Engine
                     case 0x8C:
                         {
                             instruction.Type = "TextInit";
+                            currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
                             }
-                            currentOffset += 9;
+                            currentOffset += 8;
                             break;
                         }
                     case 0x8D:
                         {
                             instruction.Type = "TextOutSet";
+                            currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
                                 instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
                             }
-                            currentOffset += 17;
+                            currentOffset += 16;
                             break;
                         }
                     case 0x8F:
                         {
                             instruction.Type = "TextOutDefault"; //or TOD
                             currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
                             break;
                         }
                     case 0x90:
                         {
                             instruction.Type = "TextDraw";
+                            currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
                                 instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
                             }
-                            currentOffset += 17;
+                            currentOffset += 16;
                             break;
                         }
                     case 0x91:
@@ -701,12 +963,38 @@ namespace FEW_Engine
                             currentOffset++;
                             break;
                         }
+                    case 0x92:
+                        {
+                            instruction.Type = "TextDrawFlag";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument + 2] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                            }
+                            currentOffset += 8;
+
+                            break;
+                        }
                     case 0x94:
                         {
                             instruction.Type = "CgUnLoad";
+                            currentOffset++;
+
                             instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1));
-                            currentOffset += 5;
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
                             break;
                         }
                     case 0x95:
@@ -734,9 +1022,11 @@ namespace FEW_Engine
                     case 0x97:
                         {
                             instruction.Type = "CgDraw";
+                            currentOffset++;
+
                             instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset + 1]);
-                            currentOffset += 2;
+                                    Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
                             break;
                         }
                     case 0x98:
@@ -755,12 +1045,35 @@ namespace FEW_Engine
                             }
                             break;
                         }
+                    case 0x99:
+                        {
+                            instruction.Type = "CgDrawKey";
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            for (int currentArgument = 0; currentArgument < 6; currentArgument++)
+                            {
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument + 1] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+
+                            break;
+                        }
                     case 0x9A:
                         {
                             instruction.Type = "CgDrawColorDodge"; //or CgDrawCD
+                            currentOffset++;
+
                             instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1));
-                            currentOffset += 5;
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
 
                             DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 6; currentArgument++)
@@ -776,9 +1089,11 @@ namespace FEW_Engine
                     case 0x9B:
                         {
                             instruction.Type = "CgDrawBlendPattern"; //or CgDrawBP
+                            currentOffset++;
+
                             instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1));
-                            currentOffset += 5;
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
 
                             DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 8; currentArgument++)
@@ -794,6 +1109,61 @@ namespace FEW_Engine
                     case 0x9C:
                         {
                             instruction.Type = "DrawMessageWindow"; //or DrawMW
+                            currentOffset++;
+                            break;
+                        }
+                    case 0xA0:
+                        {
+                            instruction.Type = "ConfigGetEffect";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            break;
+                        }
+                    case 0xA1:
+                        {
+                            instruction.Type = "SkipGet";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            break;
+                        }
+                    case 0xA2:
+                        {
+                            instruction.Type = "CtrlGet";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            break;
+                        }
+                    case 0xA3:
+                        {
+                            instruction.Type = "MemoryLoad";
+                            currentOffset++;
+
+                            break;
+                        }
+                    case 0xB5:
+                        {
+                            instruction.Type = "CharEvent";
                             currentOffset++;
                             break;
                         }
@@ -823,7 +1193,7 @@ namespace FEW_Engine
                                 instruction.Arguments[0] = "1";
                                 instruction.Arguments[1] = "0";
                             }
-                            else //Program
+                            else
                             {
                                 instruction.Type = "Program";
 
