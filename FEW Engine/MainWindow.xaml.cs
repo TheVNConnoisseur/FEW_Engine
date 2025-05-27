@@ -1,6 +1,9 @@
 ﻿using Microsoft.Win32;
 using System.IO;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -96,8 +99,9 @@ public partial class MainWindow : Window
                         byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
                         Dat dat = new Dat();
                         byte[] DecryptedFile = dat.Decrypt(Data);
-                        File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + "_metadata.dat", dat.ObtainBinaryInstructions(DecryptedFile));
-                        File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".txt", dat.Parse(DecryptedFile), shiftJIS);
+                        var options = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
+                        string json = JsonSerializer.Serialize(dat.Parse(DecryptedFile), options);
+                        File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".json", json, shiftJIS);
                     }
 
                     //WIP TO PARSE

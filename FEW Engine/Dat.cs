@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,8 +9,11 @@ namespace FEW_Engine
 {
     class Dat
     {
+        List<Instruction> instructions = new List<Instruction>();
+        List<String> strings = new List<String>();
         public Dat()
         {
+            instructions.Clear();
         }
 
         //Function that removes the decryption method used for the script
@@ -108,93 +112,438 @@ namespace FEW_Engine
         }
 
         //Function that parses the decrypted script to a human readable format
-        public string Parse(byte[] Data)
+        public List<Instruction> Parse(byte[] Data)
         {
+            //Bytes from offset 1 to 3 include the offset where presumably
+            //resides some garbage data (probably included to confuse decompilation attempts)
+            int offsetGarbage = BitConverter.ToInt32(Data, 0);
+
             //Bytes from offset 4 to 7 include the offset where the script
             //starts in the original file (when decrypted)
-            int OffsetScript = BitConverter.ToInt32(Data, 4);
-            byte[] UnparsedScript = new byte[Data.Length - OffsetScript];
-            Buffer.BlockCopy(Data, OffsetScript, UnparsedScript, 0, UnparsedScript.Length);
+            int offsetList = BitConverter.ToInt32(Data, 4);
 
-            //Since the script file is designed to always have 32-bit integers,
-            //when creating exported script file it might leave some empty lines.
-            //In order to do a performance-efficient wise approach to this problem,
-            //we just check how many empty null bytes are at the end together.
-            int BytestoOmit = 0;
-            for (int CurrentOffset = Data.Length - 1; CurrentOffset > 0; CurrentOffset--)
-            {
-                if (Data[CurrentOffset] == 0x00)
-                {
-                    BytestoOmit++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            //We remove 1 from the value obtained before because the first null
-            //byte at the end has still to be taken into consideration in order
-            //to detect the last string, but only if there's a byte detected,
-            //to avoid an out of bounds exception
-            if (BytestoOmit > 0)
-            {
-                BytestoOmit--;
-            }
-
-            int LastByteCopied = 0;
-            List<string> ParsedLines = new List<string>();
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding shiftJIS = Encoding.GetEncoding("shift-jis");
 
-            for (int CurrentOffset = 0; CurrentOffset < UnparsedScript.Length - BytestoOmit; CurrentOffset++)
-            {
-                if (UnparsedScript[CurrentOffset] == 0x00)
-                {
-                    //First we need to ensure that there is not a null byte right
-                    //at the beginning, causing an exception
-                    if (CurrentOffset > LastByteCopied)
-                    {
-                        byte[] LineBytes = new byte[CurrentOffset - LastByteCopied];
-                        Buffer.BlockCopy(UnparsedScript, LastByteCopied, LineBytes, 0, CurrentOffset - LastByteCopied);
-                        string LineString = shiftJIS.GetString(LineBytes);
-                        ParsedLines.Add(LineString);
+            int currentOffset = offsetList;
 
-                        //We add 1 byte to the last byte copied value because
-                        //we want to skip the 0x00 byte when we obtain the next string
-                        LastByteCopied = CurrentOffset + 1;
-                    }
+            while (currentOffset < Data.Length)
+            {
+                Instruction instruction = new Instruction();
+
+                int sizeInstructionArray = 0;
+
+                //All instruction values are always null-terminated strings
+                while (Data[currentOffset] != 0x00)
+                {
+                    sizeInstructionArray++;
+                    currentOffset++;
+                }
+
+                //The last instruction is always a null byte, but we ensure that we
+                //have reached it before assuming that is the case
+                if (sizeInstructionArray == 0 && currentOffset == Data.Length - 2)
+                {
+                    sizeInstructionArray++;
+                    currentOffset++;
+                }
+
+                byte[] instructionArray = new byte[sizeInstructionArray];
+                Buffer.BlockCopy(Data, currentOffset - sizeInstructionArray, instructionArray, 0, instructionArray.Length);
+                string instructionString = shiftJIS.GetString(instructionArray);
+
+                strings.Add(instructionString);
+
+                //We add 1 to the currentOffset value since we want to omit the 0x00
+                //byte when parsing the next variable
+                currentOffset++;
+            }
+
+            //The first 12 bytes are reserved for the header
+            currentOffset = 12;
+
+            //For compatibility purposes, the engine offers backwards support for some commands
+            //only offered in older versions of the engine
+            bool isTakanoScript = false;
+
+            while (currentOffset < offsetGarbage)
+            {
+                Instruction instruction = new Instruction();
+
+                switch(Data[currentOffset])
+                {
+                    case 0x4:
+                        {
+                            instruction.Type = "VideoEnd"; //or VE
+                            currentOffset += 1;
+                            break;
+                        }
+                    case 0xD:
+                        {
+                            instruction.Type = "MacroEnd"; //or Return
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x15:
+                        {
+                            instruction.Type = "AutoSave"; //or AS
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x47:
+                        {
+                            instruction.Type = "CgFullClear"; //or CFC
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x4A:
+                        {
+                            instruction.Type = "CgMidMove";
+                            instruction.Arguments[0] =
+                                    Convert.ToString(Data[currentOffset + 1]);
+                            currentOffset += 2;
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x4B:
+                        {
+                            instruction.Type = "CgMidXY"; //or CMXY
+
+                            instruction.Arguments[0] =
+                                    Convert.ToString(Data[currentOffset + 1]);
+                            currentOffset += 2;
+
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument + 1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                            }
+                            currentOffset += 8;
+
+                            break;
+                        }
+                    case 0x4D:
+                        {
+                            instruction.Type = "CgMidClear"; //or CMC
+                            instruction.Arguments[0] =
+                                    Convert.ToString(Data[currentOffset + 1]);
+                            currentOffset += 2;
+
+                            break;
+                        }
+                    case 0x4F:
+                        {
+                            instruction.Type = "CModeFlash";
+
+                            for (int currentArgument = 0; currentArgument < 7; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                            }
+                            currentOffset += 29;
+                            break;
+                        }
+                    case 0x50:
+                        {
+                            instruction.Type = "EffectFlash"; //or EFF
+                            instruction.Arguments[0] =
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + 1));
+                            currentOffset += 3;
+                            break;
+                        }
+                    case 0x51:
+                        {
+                            instruction.Type = "EffectShake";
+                            for (int currentArgument = 0; currentArgument < 4; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + 1 + (currentArgument * 2)));
+                            }
+                            currentOffset += 9;
+                            break;
+                        }
+                    case 0x55:
+                        {
+                            instruction.Type = "EffectEnvStop"; //or EFES
+                            currentOffset += 1;
+                            break;
+                        }
+                    case 0x56:
+                        {
+                            instruction.Type = "EffectEnvStopNoCreate"; //or EFESNC
+                            currentOffset += 1;
+                            break;
+                        }
+                    case 0x57:
+                        {
+                            instruction.Type = "ColorFill"; //or CFill
+
+                            for (int currentArgument = 0; currentArgument < 3; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(Data[currentOffset + 1 + currentArgument]);
+                            }
+                            currentOffset += 4;
+
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument + 3] =
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + (currentArgument * 2)));
+                            }
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x58:
+                        {
+                            instruction.Arguments[0] = Convert.ToString
+                                (BitConverter.ToInt32(Data, currentOffset + 1));
+                            currentOffset += 5;
+
+                            //To know which of instructions is the one we are dealing with, we need
+                            //to check its first argument
+                            int firstArgument = Convert.ToInt32(instruction.Arguments[0]);
+
+                            switch (firstArgument)
+                            {
+                                case 0: instruction.Type = "ColorModeNone"; break; // or CModeNone (2nd argument is always 0)
+                                case 1: instruction.Type = "ColorModeDark"; break; // or CModeDark
+                                case 2: instruction.Type = "ColorModeLight"; break; // or CModeLight
+                                case 3: instruction.Type = "ColorModeSepia"; break; // or CModeSepia (2nd argument is always 0)
+                                case 4: instruction.Type = "ColorModeMono"; break; // or CModeMono (2nd argument is always 0)
+                                default: instruction.Type = "ColorMode"; break;    // or CMode
+                            }
+                            
+                            for (int currentArgument = 0; currentArgument < 3; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument + 1] =
+                                    Convert.ToString(Data[currentOffset + (currentArgument * 1)]);
+                            }
+                            currentOffset += 3;
+
+                            break;
+                        }
+                    case 0x59:
+                        {
+                            instruction.Type = "EffectEnvLoadAlpha"; //or EFELA
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x5E:
+                        {
+                            instruction.Type = "SoundEffectPlayLoop"; //or SEPL, WavePlayLoop, WPL
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset + 1);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 5;
+                            break;
+                        }
+                    case 0x60:
+                        {
+                            instruction.Type = "SoundEffectPlayLoopABCD"; //or SEPLAD
+                            instruction.Arguments[0] =
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + 1));
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset + 3);
+                            instruction.Arguments[1] = strings[stringIndex];
+                            currentOffset += 7;
+                            break;
+                        }
+                    case 0x7E:
+                        {
+                            instruction.Type = "EventInit";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x7F:
+                        {
+                            instruction.Type = "EventSet";
+
+                            for (int currentArgument = 0; currentArgument < 6; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                            }
+                            currentOffset += 25;
+                            break;
+                        }
+                    case 0x80:
+                        {
+                            instruction.Type = "timeGetTime"; //or TimeGet
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+                            break;
+                        }
+                    case 0x81:
+                        {
+                            instruction.Type = "GetSEPPlayNow"; //or GSEPN
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            instruction.Arguments[0] = argument[0];
+                            currentOffset += Convert.ToInt32(argument[1]);
+                            break;
+                        }
+                    case 0x8C:
+                        {
+                            instruction.Type = "TextInit";
+
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                            }
+                            currentOffset += 9;
+                            break;
+                        }
+                    case 0x8D:
+                        {
+                            instruction.Type = "TextOutSet";
+
+                            for (int currentArgument = 0; currentArgument < 4; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                            }
+                            currentOffset += 17;
+                            break;
+                        }
+                    // NOT DONE case 0x8E:
+                        {
+                            instruction.Type = "TextOut";
+
+                            for (int currentArgument = 0; currentArgument < 4; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                            }
+                            currentOffset += 17;
+
+                            break;
+                        }
+                    case 0x8F:
+                        {
+                            instruction.Type = "TextOutDefault"; //or TOD
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x90:
+                        {
+                            instruction.Type = "TextDraw";
+
+                            for (int currentArgument = 0; currentArgument < 4; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                            }
+                            currentOffset += 17;
+                            break;
+                        }
+                    case 0x91:
+                        {
+                            instruction.Type = "TextDrawDefault"; //or TDD
+                            currentOffset++;
+                            break;
+                        }
+                    case 0x9A:
+                        {
+                            instruction.Type = "CgDrawColorDodge"; //or CgDrawCD
+                            instruction.Arguments[0] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1));
+                            currentOffset += 5;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 6; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument + 1] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x9B:
+                        {
+                            instruction.Type = "CgDrawBlendPattern"; //or CgDrawBP
+                            instruction.Arguments[0] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1));
+                            currentOffset += 5;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 8; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments[currentArgument + 1] = argument[0];
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+                            break;
+                        }
+                    case 0x9C:
+                        {
+                            instruction.Type = "DrawMessageWindow"; //or DrawMW
+                            currentOffset++;
+                            break;
+                        }
+                    case 0xB7:
+                        {
+                            instruction.Type = "EventStart";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0xB8:
+                        {
+                            instruction.Type = "KeyWaitMovie";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0xB9:
+                        {
+                            instruction.Type = "KeyWait";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0xF0:
+                        {
+                            if (isTakanoScript)
+                            {
+                                instruction.Type = "ReturnTitle"; //or RT
+                                instruction.Arguments[0] = "1";
+                                instruction.Arguments[1] = "0";
+                            }
+                            else //Program
+                            {
+                                instruction.Type = "Program";
+
+                                for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                                {
+                                    instruction.Arguments[currentArgument] = 
+                                        Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                                }
+                            }
+                            currentOffset += 9;
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
                 }
             }
 
-            //Join all lines with the appropriate line ending, to avoid the new line generated by WriteAllLines function
-            string ParsedScript = string.Join("\r\n", ParsedLines);
-
-            return ParsedScript;
-        }
-
-        //Function that obtains the binary data that comes after the human readable part after being decrypted.
-        //This part still needs to be documented properly in order to be parsed correctly instead of being copied
-        //and pasted from each script's original version
-        public byte[] ObtainBinaryInstructions(byte[] Data)
-        {
-            //The part that we do not understand starts after the magic signature (4 bytes) and
-            //the encryption key (16 bytes), and ends when the actual script starts. Since here
-            //we have already eliminated those first 20 bytes, we just need to take out the script
-            //from the original byte array and set to 0 the offset for the actual script
-            int OffsetScript = BitConverter.ToInt32(Data, 4);
-            byte[] BinaryInstructions = new byte[OffsetScript];
-
-            //Copy the part of the entire script file that we are interested into
-            Buffer.BlockCopy(Data, 0, BinaryInstructions, 0, OffsetScript);
-
-            //Setting the offset's script to 0
-            BinaryInstructions[4] = 0x00;
-            BinaryInstructions[5] = 0x00;
-            BinaryInstructions[6] = 0x00;
-            BinaryInstructions[7] = 0x00;
-
-            return BinaryInstructions;
+            return instructions;
         }
 
         //Function that recreates and encrypts back the decrypted script
