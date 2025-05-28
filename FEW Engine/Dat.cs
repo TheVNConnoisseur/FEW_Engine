@@ -570,6 +570,30 @@ namespace FEW_Engine
                             currentOffset += 8;
                             break;
                         }
+                    case 0x52:
+                        {
+                            instruction.Type = "EffectPattern"; //or EFSCR
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x53:
+                        {
+                            instruction.Type = "EffectScroll"; //or EFSCR
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[1] = strings[stringIndex];
+                            currentOffset += 4;
+                            break;
+                        }
                     case 0x55:
                         {
                             instruction.Type = "EffectEnvStop"; //or EFES
@@ -667,6 +691,16 @@ namespace FEW_Engine
                             instruction.Arguments[0] = 
                                 Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
                             currentOffset += 2;
+                            break;
+                        }
+                    case 0x5D:
+                        {
+                            instruction.Type = "SoundEffectPlay"; //or SEP, WavePlayDirect, WPD
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
                             break;
                         }
                     case 0x5E:
@@ -793,6 +827,26 @@ namespace FEW_Engine
                             instruction.Arguments[0] = Convert.ToString(Data[currentOffset]);
                             currentOffset++;
 
+                            break;
+                        }
+                    case 0x71:
+                        {
+                            instruction.Type = "FontChange";
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x72:
+                        {
+                            instruction.Type = "FontSetName";
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
                             break;
                         }
                     case 0x73:
@@ -985,6 +1039,20 @@ namespace FEW_Engine
                             }
                             currentOffset += 8;
 
+                            break;
+                        }
+                    case 0x93:
+                        {
+                            instruction.Type = "CgLoad";
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[1] = strings[stringIndex];
+                            currentOffset += 4;
                             break;
                         }
                     case 0x94:
@@ -1182,6 +1250,16 @@ namespace FEW_Engine
                     case 0xB9:
                         {
                             instruction.Type = "KeyWait";
+                            currentOffset++;
+                            break;
+                        }
+                    case 0xC9:
+                        {
+                            instruction.Type = "SelectDefault"; //or SD
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                Convert.ToString(Data[currentOffset]);
                             currentOffset++;
                             break;
                         }
