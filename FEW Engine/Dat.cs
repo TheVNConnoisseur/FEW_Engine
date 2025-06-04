@@ -177,8 +177,8 @@ namespace FEW_Engine
                             instruction.Type = "VideoStart"; //or VS, RecS
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
                             break;
@@ -188,8 +188,8 @@ namespace FEW_Engine
                             instruction.Type = "VideoStartAnime"; //or VSA
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
                             break;
@@ -214,22 +214,22 @@ namespace FEW_Engine
                             {
                                 instruction.Type = "Movie"; //or MV
                                 currentOffset += 2;
+
                                 for (int currentArgument = 0; currentArgument < 5; currentArgument++)
                                 {
-                                    instruction.Arguments[currentArgument] = Convert.ToString(
-                                        BitConverter.ToInt16(Data, currentOffset));
+                                    instruction.Arguments.Add(Convert.ToString(
+                                        BitConverter.ToInt16(Data, currentOffset)));
                                     currentOffset += 2;
                                 }
 
                                 int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                                instruction.Arguments[5] = strings[stringIndex];
+                                instruction.Arguments.Add(strings[stringIndex]);
                                 currentOffset += 4;
 
                                 if (Data[currentOffset] != 0xB8 && Data[currentOffset + 1] != 0x78)
                                 {
                                     throw new Exception("Movie command is missing closing bytes.");
                                 }
-
                                 currentOffset += 2;
                             }
                             else
@@ -246,7 +246,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -265,11 +265,11 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -283,11 +283,11 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -301,11 +301,11 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -319,11 +319,11 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -337,11 +337,11 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -355,11 +355,11 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -376,16 +376,16 @@ namespace FEW_Engine
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
-                                instruction.Arguments[0] = strings[stringIndex];
+                                instruction.Arguments.Add(strings[stringIndex]);
                             }
                             else
                             {
-                                instruction.Arguments[0] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                             }
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             int stringIndex1 = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[1] = strings[stringIndex1];
+                            instruction.Arguments.Add(strings[stringIndex1]);
                             currentOffset += 4;
 
                             break;
@@ -404,11 +404,11 @@ namespace FEW_Engine
                                 if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                                 {
                                     int stringIndex = Convert.ToInt32(argument[0]);
-                                    instruction.Arguments[currentArgument] = strings[stringIndex];
+                                    instruction.Arguments.Add(strings[stringIndex]);
                                 }
                                 else
                                 {
-                                    instruction.Arguments[currentArgument] = argument[0];
+                                    instruction.Arguments.Add(argument[0]);
                                 }
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -429,11 +429,11 @@ namespace FEW_Engine
                                 if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                                 {
                                     int stringIndex = Convert.ToInt32(argument[0]);
-                                    instruction.Arguments[currentArgument] = strings[stringIndex];
+                                    instruction.Arguments.Add(strings[stringIndex]);
                                 }
                                 else
                                 {
-                                    instruction.Arguments[currentArgument] = argument[0];
+                                    instruction.Arguments.Add(argument[0]);
                                 }
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -452,16 +452,16 @@ namespace FEW_Engine
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
-                                instruction.Arguments[0] = strings[stringIndex];
+                                instruction.Arguments.Add(strings[stringIndex]);
                             }
                             else
                             {
-                                instruction.Arguments[0] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                             }
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             int stringIndex1 = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[1] = strings[stringIndex1];
+                            instruction.Arguments.Add(strings[stringIndex1]);
                             currentOffset += 4;
 
                             break;
@@ -475,15 +475,15 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument + 1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 8;
 
                             break;
                         }
@@ -493,7 +493,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -508,7 +508,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -524,7 +524,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -540,7 +540,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -556,7 +556,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -572,7 +572,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -588,7 +588,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -602,16 +602,16 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
 
                             argumentArray.Initialize();
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[2] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             break;
@@ -622,7 +622,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -637,16 +637,16 @@ namespace FEW_Engine
                             instruction.Type = "CgMid"; //or CM
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
-                            instruction.Arguments[1] =
-                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[2] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -655,12 +655,12 @@ namespace FEW_Engine
                             instruction.Type = "CgMidAuto";
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[1] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -669,12 +669,12 @@ namespace FEW_Engine
                             instruction.Type = "CgMidMove";
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                    Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -684,16 +684,16 @@ namespace FEW_Engine
                             instruction.Type = "CgMidXY"; //or CMXY
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                    Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument + 1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 8;
 
                             break;
                         }
@@ -702,15 +702,15 @@ namespace FEW_Engine
                             instruction.Type = "GetMiddlePos"; //or GetMidPos, GMPos
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                   Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                   Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
                             DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             break;
@@ -734,14 +734,13 @@ namespace FEW_Engine
                                     currentOffset += 21;
 
                                     int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                                    instruction.Arguments[0] = strings[stringIndex];
+                                    instruction.Arguments.Add(strings[stringIndex]);
                                     currentOffset += 4;
                                 }
                                 else
                                 {
                                     instruction.Type = "CgMidClearAll"; //or CMCA
                                     currentOffset += 20;
-
                                 }
                             }
                             else
@@ -749,8 +748,8 @@ namespace FEW_Engine
                                 instruction.Type = "CgMidClear"; //or CMC
                                 currentOffset++;
 
-                                instruction.Arguments[0] =
-                                        Convert.ToString(Data[currentOffset]);
+                                instruction.Arguments.Add(
+                                        Convert.ToString(Data[currentOffset]));
                                 currentOffset++;
                             }
 
@@ -763,10 +762,10 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 7; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 28;
                             break;
                         }
                     case 0x50:
@@ -774,8 +773,8 @@ namespace FEW_Engine
                             instruction.Type = "EffectFlash"; //or EFF
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
                             break;
                         }
@@ -786,10 +785,10 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + (currentArgument * 2)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                                currentOffset += 2;
                             }
-                            currentOffset += 8;
                             break;
                         }
                     case 0x52:
@@ -798,7 +797,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -807,12 +806,12 @@ namespace FEW_Engine
                             instruction.Type = "EffectScroll"; //or EFSCR
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[1] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -835,17 +834,17 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 3; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(Data[currentOffset + currentArgument]);
+                                instruction.Arguments.Add(
+                                    Convert.ToString(Data[currentOffset]));
+                                currentOffset++;
                             }
-                            currentOffset += 3;
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument + 3] =
-                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset + (currentArgument * 2)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                                currentOffset += 2;
                             }
-                            currentOffset += 4;
 
                             break;
                         }
@@ -871,10 +870,10 @@ namespace FEW_Engine
                             
                             for (int currentArgument = 0; currentArgument < 3; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument + 1] =
-                                    Convert.ToString(Data[currentOffset + (currentArgument * 1)]);
+                                instruction.Arguments.Add(
+                                    Convert.ToString(Data[currentOffset]));
+                                currentOffset++;
                             }
-                            currentOffset += 3;
 
                             break;
                         }
@@ -884,7 +883,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -893,8 +892,8 @@ namespace FEW_Engine
                             instruction.Type = "MusicPlay"; //or MP
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                    Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
                             break;
@@ -910,8 +909,8 @@ namespace FEW_Engine
                             instruction.Type = "MusicStopFade"; //or MSF
                             currentOffset++;
 
-                            instruction.Arguments[0] = 
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            instruction.Arguments.Add( 
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
                             break;
                         }
@@ -921,7 +920,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -931,7 +930,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -946,12 +945,12 @@ namespace FEW_Engine
                             instruction.Type = "SoundEffectPlayLoopABCD"; //or SEPLAD
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[1] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -960,8 +959,8 @@ namespace FEW_Engine
                             instruction.Type = "SoundEffectPlayLoopStopABCD"; //or SEPLSAD
                             currentOffset++;
 
-                            instruction.Arguments[0] = 
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
                             break;
                         }
@@ -976,8 +975,8 @@ namespace FEW_Engine
                             instruction.Type = "SoundEffectPitch"; //or SETPITCH, SEPITCH
                             currentOffset++;
 
-                            instruction.Arguments[0] = 
-                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
                             break;
                         }
@@ -986,8 +985,8 @@ namespace FEW_Engine
                             instruction.Type = "SoundEffectPitchDefault"; //or SETPITCHD, SEPITCHD
                             currentOffset++;
 
-                            instruction.Arguments[0] = 
-                                Convert.ToString( BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                Convert.ToString( BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
                             break;
                         }
@@ -1000,7 +999,7 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             break;
@@ -1046,7 +1045,7 @@ namespace FEW_Engine
                             instruction.Type = "FontSize";
                             currentOffset++;
 
-                            instruction.Arguments[0] = Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
                             break;
@@ -1057,7 +1056,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -1067,7 +1066,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -1090,7 +1089,7 @@ namespace FEW_Engine
                             }
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -1107,7 +1106,7 @@ namespace FEW_Engine
                             }
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -1116,12 +1115,12 @@ namespace FEW_Engine
                             instruction.Type = "PlayMovieRateSet";
                             currentOffset++;
 
-                            instruction.Arguments[0] = Convert.ToString(
-                                BitConverter.ToInt16(Data, currentOffset));
+                            instruction.Arguments.Add(Convert.ToString(
+                                BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
 
-                            instruction.Arguments[1] = Convert.ToString(
-                                BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(Convert.ToString(
+                                BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
                             break;
                         }
@@ -1130,8 +1129,8 @@ namespace FEW_Engine
                             instruction.Type = "PlayMoviePause";
                             currentOffset++;
 
-                            instruction.Arguments[0] = Convert.ToString(
-                                BitConverter.ToInt16(Data, currentOffset));
+                            instruction.Arguments.Add(Convert.ToString(
+                                BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
                             break;
                         }
@@ -1146,7 +1145,7 @@ namespace FEW_Engine
                             instruction.Type = "AntiAliasSet";
                             currentOffset++;
 
-                            instruction.Arguments[0] = Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(Convert.ToString(Data[currentOffset]));
                             currentOffset++;
                             break;
                         }
@@ -1155,7 +1154,7 @@ namespace FEW_Engine
                             instruction.Type = "MessageWindowSet";
                             currentOffset++;
 
-                            instruction.Arguments[0] = Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(Convert.ToString(Data[currentOffset]));
                             currentOffset++;
                             break;
                         }
@@ -1166,10 +1165,10 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 3; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 12;
 
                             break;
                         }
@@ -1186,10 +1185,10 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 6; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 24;
                             break;
                         }
                     case 0x80:
@@ -1201,7 +1200,7 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
                             break;
                         }
@@ -1214,7 +1213,7 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
                             break;
                         }
@@ -1225,10 +1224,10 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 8;
                             break;
                         }
                     case 0x8D:
@@ -1238,10 +1237,10 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 16;
                             break;
                         }
                     case 0x8E:
@@ -1251,8 +1250,8 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                                 currentOffset += 4;
                             }
 
@@ -1263,11 +1262,11 @@ namespace FEW_Engine
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
-                                instruction.Arguments[5] = strings[stringIndex];
+                                instruction.Arguments.Add(strings[stringIndex]);
                             }
                             else
                             {
-                                instruction.Arguments[5] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                             }
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -1279,7 +1278,7 @@ namespace FEW_Engine
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[0] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -1290,10 +1289,10 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 16;
                             break;
                         }
                     case 0x91:
@@ -1313,16 +1312,16 @@ namespace FEW_Engine
                             {
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument + 2] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset + (currentArgument * 4)));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
                             }
-                            currentOffset += 8;
 
                             break;
                         }
@@ -1331,12 +1330,12 @@ namespace FEW_Engine
                             instruction.Type = "CgLoad";
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments[1] = strings[stringIndex];
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
                             break;
                         }
@@ -1345,8 +1344,8 @@ namespace FEW_Engine
                             instruction.Type = "CgUnLoad";
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
                             break;
                         }
@@ -1367,7 +1366,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -1377,8 +1376,8 @@ namespace FEW_Engine
                             instruction.Type = "CgDraw";
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                    Convert.ToString(Data[currentOffset]));
                             currentOffset++;
                             break;
                         }
@@ -1393,7 +1392,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -1403,8 +1402,8 @@ namespace FEW_Engine
                             instruction.Type = "CgDrawKey";
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             DecrypterHelper decrypterHelper = new DecrypterHelper();
@@ -1413,7 +1412,7 @@ namespace FEW_Engine
                             {
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument + 1] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
 
@@ -1424,8 +1423,8 @@ namespace FEW_Engine
                             instruction.Type = "CgDrawColorDodge"; //or CgDrawCD
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             DecrypterHelper decrypterHelper = new DecrypterHelper();
@@ -1434,7 +1433,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument + 1] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -1444,8 +1443,8 @@ namespace FEW_Engine
                             instruction.Type = "CgDrawBlendPattern"; //or CgDrawBP
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             DecrypterHelper decrypterHelper = new DecrypterHelper();
@@ -1454,7 +1453,7 @@ namespace FEW_Engine
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                                 string[] argument = decrypterHelper.GetParameters(argumentArray);
-                                instruction.Arguments[currentArgument + 1] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
                             break;
@@ -1477,16 +1476,16 @@ namespace FEW_Engine
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
-                                instruction.Arguments[0] = strings[stringIndex];
+                                instruction.Arguments.Add(strings[stringIndex]);
                             }
                             else
                             {
-                                instruction.Arguments[0] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                             }
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -1503,16 +1502,16 @@ namespace FEW_Engine
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
-                                instruction.Arguments[0] = strings[stringIndex];
+                                instruction.Arguments.Add(strings[stringIndex]);
                             }
                             else
                             {
-                                instruction.Arguments[0] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                             }
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -1529,16 +1528,16 @@ namespace FEW_Engine
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
-                                instruction.Arguments[0] = strings[stringIndex];
+                                instruction.Arguments.Add(strings[stringIndex]);
                             }
                             else
                             {
-                                instruction.Arguments[0] = argument[0];
+                                instruction.Arguments.Add(argument[0]);
                             }
                             currentOffset += Convert.ToInt32(argument[1]);
 
-                            instruction.Arguments[1] =
-                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
                             break;
@@ -1552,7 +1551,7 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             break;
@@ -1566,7 +1565,7 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             break;
@@ -1580,7 +1579,7 @@ namespace FEW_Engine
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
                             string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments[0] = argument[0];
+                            instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
                             break;
@@ -1621,8 +1620,8 @@ namespace FEW_Engine
                             instruction.Type = "SelectDefault"; //or SD
                             currentOffset++;
 
-                            instruction.Arguments[0] =
-                                Convert.ToString(Data[currentOffset]);
+                            instruction.Arguments.Add(
+                                Convert.ToString(Data[currentOffset]));
                             currentOffset++;
                             break;
                         }
@@ -1631,20 +1630,23 @@ namespace FEW_Engine
                             if (isTakanoScript)
                             {
                                 instruction.Type = "ReturnTitle"; //or RT
-                                instruction.Arguments[0] = "1";
-                                instruction.Arguments[1] = "0";
+                                instruction.Arguments.Add("1");
+                                instruction.Arguments.Add("0");
+
+                                currentOffset += 9;
                             }
                             else
                             {
                                 instruction.Type = "Program";
+                                currentOffset++;
 
                                 for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                                 {
-                                    instruction.Arguments[currentArgument] = 
-                                        Convert.ToString(BitConverter.ToInt32(Data, currentOffset + 1 + (currentArgument * 4)));
+                                    instruction.Arguments.Add(
+                                        Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                    currentOffset += 4;
                                 }
                             }
-                            currentOffset += 9;
                             break;
                         }
                     default:
@@ -1652,6 +1654,8 @@ namespace FEW_Engine
                             break;
                         }
                 }
+
+                instructions.Add(instruction);
             }
 
             return instructions;

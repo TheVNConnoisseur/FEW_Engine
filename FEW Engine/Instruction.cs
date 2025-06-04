@@ -12,10 +12,11 @@ namespace FEW_Engine
     public class Instruction
     {
         public string Type { get; set; }
-        public string[] Arguments { get; set; }
+        public List<string> Arguments { get; set; }
 
         public Instruction()
         {
+            Arguments = new List<string>();
         }
     }
 }

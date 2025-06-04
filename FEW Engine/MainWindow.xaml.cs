@@ -85,6 +85,7 @@ public partial class MainWindow : Window
 
         if (result == true)
         {
+
             try
             {
                 for (int CurrentFile = 0; CurrentFile < FilePaths.Length; CurrentFile++)
@@ -104,7 +105,6 @@ public partial class MainWindow : Window
                         File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".json", json, shiftJIS);
                     }
 
-                    //WIP TO PARSE
                     if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".dat"
                         && System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_define"))
                     {
