@@ -364,6 +364,108 @@ namespace FEW_Engine
 
                             break;
                         }
+                    case 0x1F:
+                        {
+                            instruction.Type = "StringSet";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
+                            {
+                                int stringIndex = Convert.ToInt32(argument[0]);
+                                instruction.Arguments[0] = strings[stringIndex];
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = argument[0];
+                            }
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            int stringIndex1 = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[1] = strings[stringIndex1];
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x20:
+                        {
+                            instruction.Type = "S2SSet"; //or S2SS
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                                if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
+                                {
+                                    int stringIndex = Convert.ToInt32(argument[0]);
+                                    instruction.Arguments[currentArgument] = strings[stringIndex];
+                                }
+                                else
+                                {
+                                    instruction.Arguments[currentArgument] = argument[0];
+                                }
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+
+                            break;
+                        }
+                    case 0x21:
+                        {
+                            instruction.Type = "S2SConnect"; //or S2SC
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            for (int currentArgument = 0; currentArgument < 2; currentArgument++)
+                            {
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                                if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
+                                {
+                                    int stringIndex = Convert.ToInt32(argument[0]);
+                                    instruction.Arguments[currentArgument] = strings[stringIndex];
+                                }
+                                else
+                                {
+                                    instruction.Arguments[currentArgument] = argument[0];
+                                }
+                                currentOffset += Convert.ToInt32(argument[1]);
+                            }
+
+                            break;
+                        }
+                    case 0x22:
+                        {
+                            instruction.Type = "S2TextConnect"; //or S2TC
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
+                            {
+                                int stringIndex = Convert.ToInt32(argument[0]);
+                                instruction.Arguments[0] = strings[stringIndex];
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = argument[0];
+                            }
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            int stringIndex1 = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[1] = strings[stringIndex1];
+                            currentOffset += 4;
+
+                            break;
+                        }
                     case 0x23:
                         {
                             instruction.Type = "FlagRand";
@@ -615,12 +717,42 @@ namespace FEW_Engine
                         }
                     case 0x4D:
                         {
-                            instruction.Type = "CgMidClear"; //or CMC
-                            currentOffset++;
+                            if (Data[currentOffset + 1] == 0x00 && Data[currentOffset + 2] == 0x4D &&
+                                Data[currentOffset + 3] == 0x01 && Data[currentOffset + 4] == 0x4D &&
+                                Data[currentOffset + 5] == 0x02 && Data[currentOffset + 6] == 0x4D &&
+                                Data[currentOffset + 7] == 0x03 && Data[currentOffset + 8] == 0x4D &&
+                                Data[currentOffset + 9] == 0x04 && Data[currentOffset + 10] == 0x4D &&
+                                Data[currentOffset + 11] == 0x05 && Data[currentOffset + 12] == 0x4D &&
+                                Data[currentOffset + 13] == 0x06 && Data[currentOffset + 14] == 0x4D &&
+                                Data[currentOffset + 15] == 0x07 && Data[currentOffset + 16] == 0x4D &&
+                                Data[currentOffset + 17] == 0x08 && Data[currentOffset + 18] == 0x4D &&
+                                Data[currentOffset + 19] == 0x09)
+                            {
+                                if (Data[currentOffset + 20] == 0x46)
+                                {
+                                    instruction.Type = "CgFullMidClear"; //or CFMC
+                                    currentOffset += 21;
 
-                            instruction.Arguments[0] =
-                                    Convert.ToString(Data[currentOffset]);
-                            currentOffset++;
+                                    int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                                    instruction.Arguments[0] = strings[stringIndex];
+                                    currentOffset += 4;
+                                }
+                                else
+                                {
+                                    instruction.Type = "CgMidClearAll"; //or CMCA
+                                    currentOffset += 20;
+
+                                }
+                            }
+                            else
+                            {
+                                instruction.Type = "CgMidClear"; //or CMC
+                                currentOffset++;
+
+                                instruction.Arguments[0] =
+                                        Convert.ToString(Data[currentOffset]);
+                                currentOffset++;
+                            }
 
                             break;
                         }
@@ -1112,6 +1244,35 @@ namespace FEW_Engine
                             currentOffset += 16;
                             break;
                         }
+                    case 0x8E:
+                        {
+                            instruction.Type = "case";
+                            currentOffset++;
+
+                            for (int currentArgument = 0; currentArgument < 4; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                                currentOffset += 4;
+                            }
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 0);
+                            if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
+                            {
+                                int stringIndex = Convert.ToInt32(argument[0]);
+                                instruction.Arguments[5] = strings[stringIndex];
+                            }
+                            else
+                            {
+                                instruction.Arguments[5] = argument[0];
+                            }
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            break;
+                        }
                     case 0x8F:
                         {
                             instruction.Type = "TextOutDefault"; //or TOD
@@ -1302,6 +1463,84 @@ namespace FEW_Engine
                         {
                             instruction.Type = "DrawMessageWindow"; //or DrawMW
                             currentOffset++;
+                            break;
+                        }
+                    case 0x9D:
+                        {
+                            instruction.Type = "SaveGetDate";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
+                            {
+                                int stringIndex = Convert.ToInt32(argument[0]);
+                                instruction.Arguments[0] = strings[stringIndex];
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = argument[0];
+                            }
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x9E:
+                        {
+                            instruction.Type = "SaveGetTitle";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
+                            {
+                                int stringIndex = Convert.ToInt32(argument[0]);
+                                instruction.Arguments[0] = strings[stringIndex];
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = argument[0];
+                            }
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x9F:
+                        {
+                            instruction.Type = "SaveGetMemo";
+                            currentOffset++;
+
+                            DecrypterHelper decrypterHelper = new DecrypterHelper();
+                            byte[] argumentArray = new byte[5];
+                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
+                            {
+                                int stringIndex = Convert.ToInt32(argument[0]);
+                                instruction.Arguments[0] = strings[stringIndex];
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = argument[0];
+                            }
+                            currentOffset += Convert.ToInt32(argument[1]);
+
+                            instruction.Arguments[1] =
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
                             break;
                         }
                     case 0xA0:
