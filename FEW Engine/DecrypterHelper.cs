@@ -76,17 +76,15 @@ namespace FEW_Engine
             }
             else if (StrictMode == 1)
             {
-                //Only when the flag starts with an "s" there is the possibility of having an array of
-                //2 bytes generated
-                if (Data[2] == 0x00 && Data[3] == 0x00 && Data[4] == 0x00)
-                {
-                    Parameters[0] = "s" + Convert.ToString(BitConverter.ToInt16(Data, 1)); //We pass the flag as a string
-                    Parameters[1] = "3";
-                }
-                else
+                if (Data[0] == 0x45)
                 {
                     Parameters[0] = Convert.ToString(BitConverter.ToInt32(Data, 2)); //We pass the number of the string list index
                     Parameters[1] = "5";
+                }
+                else
+                {
+                    Parameters[0] = "s" + Convert.ToString(BitConverter.ToInt16(Data, 1)); //We pass the flag as a string
+                    Parameters[1] = "3";
                 }
             }
                 return Parameters;
