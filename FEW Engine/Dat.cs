@@ -208,8 +208,46 @@ namespace FEW_Engine
                         }
                     case 0xE:
                         {
-                            instruction.Type = "SkipStop";
+                            if (Data[currentOffset + 1] == 0x74 && BitConverter.ToInt16(Data, currentOffset + 2) == 0x00
+                                && BitConverter.ToInt16(Data, currentOffset + 4) == 0x00
+                                && BitConverter.ToInt16(Data, currentOffset + 6) == 0x00)
+                            {
+                                instruction.Type = "Movie"; //or MV
+                                currentOffset += 2;
+                                for (int currentArgument = 0; currentArgument < 5; currentArgument++)
+                                {
+                                    instruction.Arguments[currentArgument] = Convert.ToString(
+                                        BitConverter.ToInt16(Data, currentOffset));
+                                    currentOffset += 2;
+                                }
+
+                                int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                                instruction.Arguments[5] = strings[stringIndex];
+                                currentOffset += 4;
+
+                                if (Data[currentOffset] != 0xB8 && Data[currentOffset + 1] != 0x78)
+                                {
+                                    throw new Exception("Movie command is missing closing bytes.");
+                                }
+
+                                currentOffset += 2;
+                            }
+                            else
+                            {
+                                instruction.Type = "SkipStop";
+                                currentOffset++;
+                            }
+                                
+                            break;
+                        }
+                    case 0x14:
+                        {
+                            instruction.Type = "SaveStatus"; //or SS
                             currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
                             break;
                         }
                     case 0x15:
@@ -347,6 +385,16 @@ namespace FEW_Engine
 
                             break;
                         }
+                    case 0x24:
+                        {
+                            instruction.Type = "FlagCg";
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
+                            break;
+                        }
                     case 0x31:
                         {
                             instruction.Type = "F2FAdd";
@@ -466,10 +514,52 @@ namespace FEW_Engine
 
                             break;
                         }
+                    case 0x46:
+                        {
+                            instruction.Type = "CgFull"; //or CF
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
+                            break;
+                        }
                     case 0x47:
                         {
                             instruction.Type = "CgFullClear"; //or CFC
                             currentOffset++;
+                            break;
+                        }
+                    case 0x48:
+                        {
+                            instruction.Type = "CgMid"; //or CM
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
+                            instruction.Arguments[1] =
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset));
+                            currentOffset += 4;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[2] = strings[stringIndex];
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x49:
+                        {
+                            instruction.Type = "CgMidAuto";
+                            currentOffset++;
+
+                            instruction.Arguments[0] =
+                                Convert.ToString(Data[currentOffset]);
+                            currentOffset++;
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[1] = strings[stringIndex];
+                            currentOffset += 4;
                             break;
                         }
                     case 0x4A:
@@ -853,6 +943,40 @@ namespace FEW_Engine
                         {
                             instruction.Type = "FontReset";
                             currentOffset++;
+                            break;
+                        }
+                    case 0x74:
+                        {
+                            instruction.Type = "PlayCutMovie";
+                            currentOffset++;
+
+                            for (int currentInstruction = 0; currentInstruction < 5; currentInstruction++)
+                            {
+                                instruction.Arguments[currentInstruction] = Convert.ToString(
+                                BitConverter.ToInt16(Data, currentOffset));
+                                currentOffset += 2;
+                            }
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
+                            break;
+                        }
+                    case 0x75:
+                        {
+                            instruction.Type = "PlayCutMovieLoop";
+                            currentOffset++;
+
+                            for (int currentArgument = 0; currentArgument < 5; currentArgument++)
+                            {
+                                instruction.Arguments[currentArgument] = Convert.ToString(
+                                BitConverter.ToInt16(Data, currentOffset));
+                                currentOffset += 2;
+                            }
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments[0] = strings[stringIndex];
+                            currentOffset += 4;
                             break;
                         }
                     case 0x76:
