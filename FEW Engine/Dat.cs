@@ -755,9 +755,18 @@ namespace FEW_Engine
 
                             break;
                         }
+                    case 0x4E:
+                        {
+                            instruction.Type = "Effect"; //or EF
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                    Convert.ToString(Data[currentOffset]));
+                            currentOffset++;
+                            break;
+                        }
                     case 0x4F:
                         {
-                            instruction.Type = "CModeFlash";
                             currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 7; currentArgument++)
@@ -766,6 +775,33 @@ namespace FEW_Engine
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                                 currentOffset += 4;
                             }
+
+                            if (instruction.Arguments[0] == "0" && instruction.Arguments[1] == "0"
+                                && instruction.Arguments[2] == "0" && instruction.Arguments[3] == "220"
+                                && instruction.Arguments[4] == "220" && instruction.Arguments[5] == "220")
+                            {
+                                instruction.Type = "Effect"; //or EF
+                                
+                                if (instruction.Arguments[6] == "200" && Data[currentOffset] == 0x4E
+                                    && Data[currentOffset + 1] == 0x17)
+                                {
+                                    instruction.Arguments.Clear();
+                                    instruction.Arguments.Add("Z");
+                                    currentOffset += 2;
+                                }
+                                else if (instruction.Arguments[6] == "10" && Data[currentOffset] == 0x4E
+                                    && Data[currentOffset + 1] == 0x15)
+                                {
+                                    instruction.Arguments.Clear();
+                                    instruction.Arguments.Add("]");
+                                    currentOffset += 2;
+                                }
+                            }
+                            else
+                            {
+                                instruction.Type = "CModeFlash";
+                            }
+                            
                             break;
                         }
                     case 0x50:
@@ -789,16 +825,37 @@ namespace FEW_Engine
                                     Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                                 currentOffset += 2;
                             }
+
                             break;
                         }
                     case 0x52:
                         {
-                            instruction.Type = "EffectPattern"; //or EFSCR
                             currentOffset++;
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
                             instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
+                            
+                            switch (instruction.Arguments[0])
+                            {
+                                case "pef_clo":
+                                    {
+                                        instruction.Type = "Effect"; //or EF
+                                        instruction.Arguments[0] = "^";
+                                        break;
+                                    }
+                                case "pef_cir":
+                                    {
+                                        instruction.Type = "Effect"; //or EF
+                                        instruction.Arguments[0] = "_";
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        instruction.Type = "EffectPattern"; //or EFSCR
+                                        break;
+                                    }
+                            }
                             break;
                         }
                     case 0x53:
@@ -813,6 +870,16 @@ namespace FEW_Engine
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
                             instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
+                            break;
+                        }
+                    case 0x54:
+                        {
+                            instruction.Type = "EFE";
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(Data[currentOffset]));
+                            currentOffset++;
                             break;
                         }
                     case 0x55:
