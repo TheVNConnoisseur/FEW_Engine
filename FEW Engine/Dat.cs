@@ -166,6 +166,11 @@ namespace FEW_Engine
             //only offered in older versions of the engine
             bool isTakanoScript = false;
 
+            //The game uses a jump list to make the game go around certain parts of the script (branching paths),
+            //so what the game does when compiling the game is first leave a placeholder of 4 bytes at whatever point
+            //it wants to jump to, and then it will fill that placeholder with the offset of the instruction
+            int jumpList = 0;
+
             while (currentOffset < offsetGarbage)
             {
                 Instruction instruction = new Instruction();
@@ -198,6 +203,24 @@ namespace FEW_Engine
                         {
                             instruction.Type = "VideoEnd"; //or VE
                             currentOffset++;
+                            break;
+                        }
+                    case 0xB:
+                        {
+                            instruction.Type = "Goto"; //or g
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0xC:
+                        {
+                            instruction.Type = "Gosub"; //or gs
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
                             break;
                         }
                     case 0xD:
@@ -497,6 +520,510 @@ namespace FEW_Engine
                             currentOffset += 4;
                             break;
                         }
+                    case 0x25:
+                        {
+                            instruction.Type = "FlagCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("=="); //or =
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x26:
+                        {
+                            instruction.Type = "FlagCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("!=");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x27:
+                        {
+                            instruction.Type = "FlagCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("<");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x28:
+                        {
+                            instruction.Type = "FlagCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add(">");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x29:
+                        {
+                            instruction.Type = "FlagCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("<=");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x2A:
+                        {
+                            instruction.Type = "FlagCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch(Data[currentOffset])
+                                {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add(">=");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x2B:
+                        {
+                            instruction.Type = "FlagCheckGosub"; //or FlagCheckG
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("=="); //or =
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x2C:
+                        {
+                            instruction.Type = "FlagCheckGosub"; //or FlagCheckG
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("!=");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x2D:
+                        {
+                            instruction.Type = "FlagCheckGosub"; //or FlagCheckG
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("<");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x2E:
+                        {
+                            instruction.Type = "FlagCheckGosub"; //or FlagCheckG
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add(">");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x2F:
+                        {
+                            instruction.Type = "FlagCheckGosub"; //or FlagCheckG
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("<=");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x30:
+                        {
+                            instruction.Type = "FlagCheckGosub"; //or FlagCheckG
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x3E:
+                                    instruction.Arguments.Add("f");
+                                    break;
+                                case 0x42:
+                                    instruction.Arguments.Add("c");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add(">=");
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
                     case 0x31:
                         {
                             instruction.Type = "F2FAdd";
@@ -613,6 +1140,324 @@ namespace FEW_Engine
                             argument = decrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
+
+                            break;
+                        }
+                    case 0x38:
+                        {
+                            instruction.Type = "F2FCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            //We obtain the first flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            //We add the comparator
+                            instruction.Arguments.Add("=="); //or =
+
+                            //Now we do the second flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x39:
+                        {
+                            instruction.Type = "F2FCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            //We obtain the first flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            //We add the comparator
+                            instruction.Arguments.Add("!=");
+
+                            //Now we do the second flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x3A:
+                        {
+                            instruction.Type = "F2FCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            //We obtain the first flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            //We add the comparator
+                            instruction.Arguments.Add("<");
+
+                            //Now we do the second flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x3B:
+                        {
+                            instruction.Type = "F2FCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            //We obtain the first flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            //We add the comparator
+                            instruction.Arguments.Add(">");
+
+                            //Now we do the second flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x3C:
+                        {
+                            instruction.Type = "F2FCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            //We obtain the first flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            //We add the comparator
+                            instruction.Arguments.Add("<=");
+
+                            //Now we do the second flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
+
+                            break;
+                        }
+                    case 0x3D:
+                        {
+                            instruction.Type = "F2FCheck";
+                            currentOffset++; //The first byte here it really tells us the operand used here, but
+                            //since the operands are only used in this type of instruction, we can set it immediately
+
+                            //We obtain the first flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            //We add the comparator
+                            instruction.Arguments.Add(">=");
+
+                            //Now we do the second flag
+                            switch (Data[currentOffset])
+                            {
+                                case 0x3F:
+                                    instruction.Arguments.Add("g");
+                                    break;
+                                case 0x43:
+                                    //Check to see if the code is done correctly, because when the flag is not supposed
+                                    //to have any kind of special flag, it has this opcode
+                                    break;
+                                default:
+                                    throw new Exception("Unknown flag check value: " + Data[currentOffset]);
+                            }
+                            currentOffset++;
+
+                            instruction.Arguments.Add(
+                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            currentOffset += 2;
+
+                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
+                            jumpList++;
+                            currentOffset += 4;
 
                             break;
                         }
@@ -816,7 +1661,6 @@ namespace FEW_Engine
                         }
                     case 0x51:
                         {
-                            instruction.Type = "EffectShake";
                             currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
@@ -824,6 +1668,25 @@ namespace FEW_Engine
                                 instruction.Arguments.Add(
                                     Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                                 currentOffset += 2;
+                            }
+
+                            if (instruction.Arguments[0] == "0" && instruction.Arguments[1] == "30"
+                                && instruction.Arguments[2] == "80" && instruction.Arguments[3] == "400")
+                            {
+                                instruction.Type = "Effect"; //or EF
+                                instruction.Arguments.Clear();
+                                instruction.Arguments.Add("[");
+                            }
+                            else if (instruction.Arguments[0] == "30" && instruction.Arguments[1] == "0"
+                                && instruction.Arguments[2] == "80" && instruction.Arguments[3] == "400")
+                            {
+                                instruction.Type = "Effect"; //or EF
+                                instruction.Arguments.Clear();
+                                instruction.Arguments.Add("\\");
+                            }
+                            else
+                            {
+                                instruction.Type = "EffectShake";
                             }
 
                             break;
