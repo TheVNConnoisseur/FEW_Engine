@@ -171,7 +171,7 @@ namespace FEW_Engine
             //it wants to jump to, and then it will fill that placeholder with the offset of the instruction
             int jumpList = 0;
 
-            while (currentOffset < offsetGarbage)
+            while (currentOffset < offsetGarbage - 1)
             {
                 Instruction instruction = new Instruction();
 
@@ -201,7 +201,7 @@ namespace FEW_Engine
                         }
                     case 0x4:
                         {
-                            instruction.Type = "VideoEnd"; //or VE
+                            instruction.Type = "VideoEnd"; //or VE, RecE
                             currentOffset++;
                             break;
                         }
@@ -218,7 +218,7 @@ namespace FEW_Engine
                         }
                     case 0xC:
                         {
-                            instruction.Type = "Gosub"; //or gs
+                            instruction.Type = "Gosub"; //or gs (or it also can be an instruction without an explicit name type)
                             currentOffset++;
 
                             instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
@@ -375,19 +375,35 @@ namespace FEW_Engine
                         }
                     case 0x1E:
                         {
-                            instruction.Type = "FlagSet";
-                            currentOffset++;
+                            currentOffset++; //We cannot confirm the instruction type yet
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
-                            byte[] argumentArray = new byte[5];
-                            Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
-                            instruction.Arguments.Add(argument[0]);
-                            currentOffset += Convert.ToInt32(argument[1]);
+                            if (Data[currentOffset + 3] == 0x41)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(Data[currentOffset]));
+                                currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
-                            currentOffset += 4;
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                                currentOffset += 2;
+
+                                currentOffset++; //We skip the 0x41 byte
+                            }
+                            else
+                            {
+                                instruction.Type = "FlagSet";
+
+                                DecrypterHelper decrypterHelper = new DecrypterHelper();
+                                byte[] argumentArray = new byte[5];
+                                Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
+                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                instruction.Arguments.Add(argument[0]);
+                                currentOffset += Convert.ToInt32(argument[1]);
+
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
+                                currentOffset += 4;
+                            }
 
                             break;
                         }
@@ -1159,7 +1175,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1181,7 +1197,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1212,7 +1228,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1234,7 +1250,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1265,7 +1281,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1287,7 +1303,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1318,7 +1334,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1340,7 +1356,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1371,7 +1387,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1393,7 +1409,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1424,7 +1440,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1446,7 +1462,7 @@ namespace FEW_Engine
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
                                     break;
-                                case 0x43:
+                                case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
                                     //to have any kind of special flag, it has this opcode
                                     break;
@@ -1784,9 +1800,11 @@ namespace FEW_Engine
                         }
                     case 0x58:
                         {
-                            instruction.Arguments[0] = Convert.ToString
-                                (BitConverter.ToInt32(Data, currentOffset + 1));
-                            currentOffset += 5;
+                            currentOffset++;
+
+                            instruction.Arguments.Add(Convert.ToString
+                                (BitConverter.ToInt32(Data, currentOffset)));
+                            currentOffset += 4;
 
                             //To know which of instructions is the one we are dealing with, we need
                             //to check its first argument
@@ -1802,7 +1820,7 @@ namespace FEW_Engine
                                 default: instruction.Type = "ColorMode"; break;    // or CMode
                             }
                             
-                            for (int currentArgument = 0; currentArgument < 3; currentArgument++)
+                            for (int currentArgument = 1; currentArgument < 4; currentArgument++)
                             {
                                 instruction.Arguments.Add(
                                     Convert.ToString(Data[currentOffset]));
@@ -2017,8 +2035,8 @@ namespace FEW_Engine
 
                             for (int currentInstruction = 0; currentInstruction < 5; currentInstruction++)
                             {
-                                instruction.Arguments[currentInstruction] = Convert.ToString(
-                                BitConverter.ToInt16(Data, currentOffset));
+                                instruction.Arguments.Add(Convert.ToString(
+                                    BitConverter.ToInt16(Data, currentOffset)));
                                 currentOffset += 2;
                             }
 
@@ -2034,8 +2052,8 @@ namespace FEW_Engine
 
                             for (int currentArgument = 0; currentArgument < 5; currentArgument++)
                             {
-                                instruction.Arguments[currentArgument] = Convert.ToString(
-                                BitConverter.ToInt16(Data, currentOffset));
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                                 currentOffset += 2;
                             }
 
@@ -2179,7 +2197,7 @@ namespace FEW_Engine
                         }
                     case 0x8E:
                         {
-                            instruction.Type = "case";
+                            instruction.Type = "TextOut";
                             currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
@@ -2549,9 +2567,28 @@ namespace FEW_Engine
                             currentOffset++;
                             break;
                         }
+                    case 0xC8:
+                        {
+                            instruction.Type = "SelectPrint"; //or SP
+                            currentOffset++;
+
+                            //This value will be either 8 or the amount of instructions before reaching one
+                            //that is "end" (including that one)
+                            int totalArguments = Data[currentOffset];
+                            currentOffset++;
+
+                            for (int currentArgument = 0; currentArgument < totalArguments; currentArgument++)
+                            {
+                                int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                                instruction.Arguments.Add(strings[stringIndex]);
+                                currentOffset += 4;
+                            }
+
+                            break;
+                        }
                     case 0xC9:
                         {
-                            instruction.Type = "SelectDefault"; //or SD
+                            instruction.Type = "SelectDefault"; //or SD, case
                             currentOffset++;
 
                             instruction.Arguments.Add(
