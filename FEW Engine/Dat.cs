@@ -208,6 +208,8 @@ namespace FEW_Engine
                     case 0xB:
                         {
                             instruction.Type = "Goto"; //or g
+                            currentOffset++;
+
                             instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
                             jumpList++;
                             currentOffset += 4;
@@ -217,6 +219,8 @@ namespace FEW_Engine
                     case 0xC:
                         {
                             instruction.Type = "Gosub"; //or gs
+                            currentOffset++;
+
                             instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
                             jumpList++;
                             currentOffset += 4;
@@ -2633,6 +2637,18 @@ namespace FEW_Engine
 
                             int stringIndex1 = BitConverter.ToInt32(Data, currentOffset);
                             instruction.Arguments.Add(strings[stringIndex1]);
+                            currentOffset += 4;
+
+                            currentOffset += 4; //These last 4 bytes are always an incrementing value, starting from 0
+
+                            break;
+                        }
+                    case 0xE9:
+                        {
+                            currentOffset++; //There is no name for some instructions apparently, so we cannot name it
+
+                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[stringIndex]);
                             currentOffset += 4;
 
                             currentOffset += 4; //These last 4 bytes are always an incrementing value, starting from 0
