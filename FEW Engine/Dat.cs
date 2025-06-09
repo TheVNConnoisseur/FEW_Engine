@@ -180,7 +180,7 @@ namespace FEW_Engine
                 if (matchingLabel.Address == currentOffset || labels.Any(l => l.Address == 0 && currentOffset == 0))
                 {
                     Instruction labelInstruction = new Instruction();
-                    labelInstruction.Type = "Label";
+                    labelInstruction.Type = "Label"; //or Macro, or $
                     labelInstruction.Arguments.Add(matchingLabel.Name);
                     instructions.Add(labelInstruction);
                 }
@@ -575,8 +575,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] + 
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add("=="); //or =
@@ -622,8 +631,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add("!=");
@@ -669,8 +687,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add("<");
@@ -716,8 +743,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add(">");
@@ -763,8 +799,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add("<=");
@@ -810,8 +855,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add(">=");
