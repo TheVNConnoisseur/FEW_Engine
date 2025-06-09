@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FEW_Engine
 {
-    internal class DecrypterHelper
+    internal static class DecrypterHelper
     {
 
         //Function that obtains the parameter given a data array
@@ -18,7 +19,7 @@ namespace FEW_Engine
         //It will return a string array of 2 values, first it will be the actual
         //parameter to parse, and second value will be the amount of bytes
         //that have been parsed, so that we do not skip any unprocessed byte
-        public string[] GetParameters(byte[] Data)
+        public static string[] GetParameters(byte[] Data)
         {
             string[] Parameters = new string[2];
             switch (Data[0])
@@ -58,7 +59,7 @@ namespace FEW_Engine
         //it will be accepted but treated differently.
         //Important to always to ensure that the parameter given is at least 5 bytes
         //long, so it can parse all of the bytes needed for each case.
-        public string[] GetStringParameters(byte[] Data, int StrictMode)
+        public static string[] GetStringParameters(byte[] Data, int StrictMode)
         {
             string[] Parameters = new string[2];
             if (StrictMode == 0)
@@ -88,6 +89,29 @@ namespace FEW_Engine
                 }
             }
                 return Parameters;
+        }
+
+        //The game uses a label list to make the game go around certain parts of the script (branching paths),
+        //so what the game does when compiling the game is first leave a placeholder of 4 bytes at whatever point
+        //it wants to jump to, and then it will fill that placeholder with the offset of the instruction
+        public static Label CreateLabel(List<Label> labels, int address)
+        {
+            // Try to find existing label
+            var existingLabel = labels.FirstOrDefault(l => l.Address == address);
+
+            if (existingLabel.Address != 0 || labels.Any(l => l.Address == 0)) //Covers address 0 edge case
+            {
+                return existingLabel;
+            }
+
+            //Create and add new label
+            var newLabel = new Label
+            {
+                Name = "Label_" + labels.Count(),
+                Address = address
+            };
+            labels.Add(newLabel);
+            return newLabel;
         }
     }
 }

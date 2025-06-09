@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,9 +12,11 @@ namespace FEW_Engine
     {
         List<Instruction> instructions = new List<Instruction>();
         List<String> strings = new List<String>();
+        List<Label> labels = new List<Label>();
         public Dat()
         {
             instructions.Clear();
+            labels.Clear();
         }
 
         //Function that removes the decryption method used for the script
@@ -166,16 +169,23 @@ namespace FEW_Engine
             //only offered in older versions of the engine
             bool isTakanoScript = false;
 
-            //The game uses a jump list to make the game go around certain parts of the script (branching paths),
-            //so what the game does when compiling the game is first leave a placeholder of 4 bytes at whatever point
-            //it wants to jump to, and then it will fill that placeholder with the offset of the instruction
-            int jumpList = 0;
-
             while (currentOffset < offsetGarbage - 1)
             {
                 Instruction instruction = new Instruction();
 
-                switch(Data[currentOffset])
+                //First we check if before the following instruction there is a label that matches the current offset,
+                //because if it is the case, we will create the corresponding instruction for it
+                var matchingLabel = labels.FirstOrDefault(l => l.Address == currentOffset);
+
+                if (matchingLabel.Address == currentOffset || labels.Any(l => l.Address == 0 && currentOffset == 0))
+                {
+                    Instruction labelInstruction = new Instruction();
+                    labelInstruction.Type = "Label";
+                    labelInstruction.Arguments.Add(matchingLabel.Name);
+                    instructions.Add(labelInstruction);
+                }
+
+                switch (Data[currentOffset])
                 {
                     case 0x2:
                         {
@@ -210,8 +220,13 @@ namespace FEW_Engine
                             instruction.Type = "Goto"; //or g
                             currentOffset++;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -221,8 +236,13 @@ namespace FEW_Engine
                             instruction.Type = "Gosub"; //or gs (or it also can be an instruction without an explicit name type)
                             currentOffset++;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -288,10 +308,9 @@ namespace FEW_Engine
                             instruction.Type = "FlagAdd";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -306,10 +325,9 @@ namespace FEW_Engine
                             instruction.Type = "FlagSub";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -324,10 +342,9 @@ namespace FEW_Engine
                             instruction.Type = "FlagMul";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -342,10 +359,9 @@ namespace FEW_Engine
                             instruction.Type = "FlagDiv";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -360,10 +376,9 @@ namespace FEW_Engine
                             instruction.Type = "FlagExc";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -393,10 +408,9 @@ namespace FEW_Engine
                             {
                                 instruction.Type = "FlagSet";
 
-                                DecrypterHelper decrypterHelper = new DecrypterHelper();
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
 
@@ -412,10 +426,9 @@ namespace FEW_Engine
                             instruction.Type = "StringSet";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            string[] argument = DecrypterHelper.GetStringParameters(argumentArray, 1);
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
@@ -438,12 +451,11 @@ namespace FEW_Engine
                             instruction.Type = "S2SSet"; //or S2SS
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                                string[] argument = DecrypterHelper.GetStringParameters(argumentArray, 1);
                                 if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                                 {
                                     int stringIndex = Convert.ToInt32(argument[0]);
@@ -463,12 +475,11 @@ namespace FEW_Engine
                             instruction.Type = "S2SConnect"; //or S2SC
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                                string[] argument = DecrypterHelper.GetStringParameters(argumentArray, 1);
                                 if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                                 {
                                     int stringIndex = Convert.ToInt32(argument[0]);
@@ -488,10 +499,9 @@ namespace FEW_Engine
                             instruction.Type = "S2TextConnect"; //or S2TC
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            string[] argument = DecrypterHelper.GetStringParameters(argumentArray, 1);
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
@@ -514,10 +524,9 @@ namespace FEW_Engine
                             instruction.Type = "FlagRand";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -576,8 +585,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -618,8 +632,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -660,8 +679,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -702,8 +726,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -744,8 +773,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -786,8 +820,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -828,8 +867,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -870,8 +914,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -912,8 +961,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -954,8 +1008,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -996,8 +1055,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -1038,8 +1102,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -1049,12 +1118,11 @@ namespace FEW_Engine
                             instruction.Type = "F2FAdd";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -1065,12 +1133,11 @@ namespace FEW_Engine
                             instruction.Type = "F2FSub";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -1081,12 +1148,11 @@ namespace FEW_Engine
                             instruction.Type = "F2FMul";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -1097,12 +1163,11 @@ namespace FEW_Engine
                             instruction.Type = "F2FDiv";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -1113,12 +1178,11 @@ namespace FEW_Engine
                             instruction.Type = "F2FExc";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -1129,12 +1193,11 @@ namespace FEW_Engine
                             instruction.Type = "F2FSet";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -1145,10 +1208,9 @@ namespace FEW_Engine
                             instruction.Type = "F2FRand";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -1157,7 +1219,7 @@ namespace FEW_Engine
 
                             argumentArray.Initialize();
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            argument = decrypterHelper.GetParameters(argumentArray);
+                            argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -1210,8 +1272,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -1263,8 +1330,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -1316,8 +1388,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -1369,8 +1446,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -1422,8 +1504,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -1475,8 +1562,13 @@ namespace FEW_Engine
                                 Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
                             currentOffset += 2;
 
-                            instruction.Arguments.Add("label_" + jumpList); //How to add a comp_add_jump_label
-                            jumpList++;
+                            int labelIndex = BitConverter.ToInt32(Data, currentOffset);
+                            Label label = DecrypterHelper.CreateLabel(labels, labelIndex);
+                            if (label.Name == "Label_" + labels.Count()) //If the label is new, we add it to the list of labels
+                            {
+                                labels.Add(label);
+                            }
+                            instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
                             break;
@@ -1571,10 +1663,9 @@ namespace FEW_Engine
                                    Convert.ToString(Data[currentOffset]));
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -1947,10 +2038,9 @@ namespace FEW_Engine
                             instruction.Type = "Sleep";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -2148,10 +2238,9 @@ namespace FEW_Engine
                             instruction.Type = "timeGetTime"; //or TimeGet
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
                             break;
@@ -2161,10 +2250,9 @@ namespace FEW_Engine
                             instruction.Type = "GetSEPPlayNow"; //or GSEPN
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
                             break;
@@ -2207,10 +2295,9 @@ namespace FEW_Engine
                                 currentOffset += 4;
                             }
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 0);
+                            string[] argument = DecrypterHelper.GetStringParameters(argumentArray, 0);
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
@@ -2258,12 +2345,11 @@ namespace FEW_Engine
                             instruction.Type = "TextDrawFlag";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
                             {
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -2312,12 +2398,11 @@ namespace FEW_Engine
                             instruction.Type = "CgInitRect";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -2338,12 +2423,11 @@ namespace FEW_Engine
                             instruction.Type = "CgShow";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 4; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -2358,12 +2442,11 @@ namespace FEW_Engine
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             for (int currentArgument = 0; currentArgument < 6; currentArgument++)
                             {
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -2379,12 +2462,11 @@ namespace FEW_Engine
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 6; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -2399,12 +2481,11 @@ namespace FEW_Engine
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             for (int currentArgument = 0; currentArgument < 8; currentArgument++)
                             {
                                 byte[] argumentArray = new byte[5];
                                 Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                                string[] argument = decrypterHelper.GetParameters(argumentArray);
+                                string[] argument = DecrypterHelper.GetParameters(argumentArray);
                                 instruction.Arguments.Add(argument[0]);
                                 currentOffset += Convert.ToInt32(argument[1]);
                             }
@@ -2421,10 +2502,9 @@ namespace FEW_Engine
                             instruction.Type = "SaveGetDate";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            string[] argument = DecrypterHelper.GetStringParameters(argumentArray, 1);
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
@@ -2447,10 +2527,9 @@ namespace FEW_Engine
                             instruction.Type = "SaveGetTitle";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            string[] argument = DecrypterHelper.GetStringParameters(argumentArray, 1);
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
@@ -2473,10 +2552,9 @@ namespace FEW_Engine
                             instruction.Type = "SaveGetMemo";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetStringParameters(argumentArray, 1);
+                            string[] argument = DecrypterHelper.GetStringParameters(argumentArray, 1);
                             if (Convert.ToInt32(argument[1]) == 5) //If the amount of bytes read is 5, it means that the last 4 bytes are the index of the string array
                             {
                                 int stringIndex = Convert.ToInt32(argument[0]);
@@ -2499,10 +2577,9 @@ namespace FEW_Engine
                             instruction.Type = "ConfigGetEffect";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -2513,10 +2590,9 @@ namespace FEW_Engine
                             instruction.Type = "SkipGet";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
@@ -2527,10 +2603,9 @@ namespace FEW_Engine
                             instruction.Type = "CtrlGet";
                             currentOffset++;
 
-                            DecrypterHelper decrypterHelper = new DecrypterHelper();
                             byte[] argumentArray = new byte[5];
                             Buffer.BlockCopy(Data, currentOffset, argumentArray, 0, 5);
-                            string[] argument = decrypterHelper.GetParameters(argumentArray);
+                            string[] argument = DecrypterHelper.GetParameters(argumentArray);
                             instruction.Arguments.Add(argument[0]);
                             currentOffset += Convert.ToInt32(argument[1]);
 
