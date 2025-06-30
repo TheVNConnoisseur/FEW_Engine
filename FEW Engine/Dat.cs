@@ -117,20 +117,24 @@ namespace FEW_Engine
         //Function that parses the decrypted script to a human readable format
         public List<Instruction> Parse(byte[] Data)
         {
-            //Bytes from offset 1 to 3 include the offset where presumably
-            //resides some garbage data (probably included to confuse decompilation attempts)
-            int offsetGarbage = BitConverter.ToInt32(Data, 0);
+            //Bytes from offset 1 to 3 include the offset where the labels/macro/$ names and offsets
+            //for each of them are stored. Well in theory that's what they are used for, but
+            //in practice they don't seem to store anything of value? Or at least the game analyzed
+            //here does not use them at all from this list, since the game engine already stores the
+            //offset in the bytecode itself.
+            int offsetLabels = BitConverter.ToInt32(Data, 0);
 
-            //Bytes from offset 4 to 7 include the offset where the script
-            //starts in the original file (when decrypted)
+            //Bytes from offset 4 to 7 include the offset where the list of strings starts
             int offsetList = BitConverter.ToInt32(Data, 4);
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding shiftJIS = Encoding.GetEncoding("shift-jis");
 
+            //We first parse the strings list, since those will be used to fill out the arguments for some instructions
             int currentOffset = offsetList;
 
-            while (currentOffset < Data.Length)
+            //The string list when completed, the compiler includes a null byte at the end
+            while (currentOffset < Data.Length - 1)
             {
                 Instruction instruction = new Instruction();
 
@@ -166,10 +170,12 @@ namespace FEW_Engine
             currentOffset = 12;
 
             //For compatibility purposes, the engine offers backwards support for some commands
-            //only offered in older versions of the engine
+            //only offered in older versions of the engine (although for simplicity purposes those are not implemented
+            //here, since we can't know if those commands are used in the script or not)
             bool isTakanoScript = false;
 
-            while (currentOffset < offsetGarbage - 1)
+            //The compiler adds an extra byte (0x01) at the end of the bytecode
+            while (currentOffset < offsetLabels - 1)
             {
                 Instruction instruction = new Instruction();
 

@@ -85,7 +85,6 @@ public partial class MainWindow : Window
 
         if (result == true)
         {
-
             try
             {
                 for (int CurrentFile = 0; CurrentFile < FilePaths.Length; CurrentFile++)
