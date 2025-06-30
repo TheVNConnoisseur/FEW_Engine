@@ -2842,35 +2842,58 @@ namespace FEW_Engine
             return instructions;
         }
 
-        //Function that recreates and encrypts back the decrypted script
-        public byte[] Encrypt(string JSON)
+        public byte[] Compile(string JSON)
         {
+            //First we need to deserialize the JSON string into a list of instructions
             var options = new JsonSerializerOptions
             {
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
             };
             instructions = JsonSerializer.Deserialize<List<Instruction>>(JSON, options) ?? new List<Instruction>();
+            return null;
+        }
 
+        //Function that recreates and encrypts back the decrypted script
+        public byte[] Encrypt(byte[] UnencryptedScript)
+        {
             //The actual encryption process is a standard XOR one with the key set in place
             int EncryptionKeyIndex = 0;
 
-            //byte[] EncryptedScript = new byte[UnencryptedScript.Length];
-            //Buffer.BlockCopy(UnencryptedScript, 0, EncryptedScript, 0, Header.Length + Key.Length);
-            //for (int CurrentOffset = Header.Length + Key.Length; CurrentOffset < UnencryptedScript.Length; CurrentOffset++)
-            //{
-            //    EncryptedScript[CurrentOffset] = (byte)(Key[EncryptionKeyIndex] ^ UnencryptedScript[CurrentOffset]);
-            //    EncryptionKeyIndex++;
+            //First we create the magic signature array, which is always the same
+            byte[] MagicSignature = { 0x00, 0x00, 0x00, 0x01 };
 
-            //    //Each 16 bytes, the key gets renewed
-            //    if (EncryptionKeyIndex == 16)
-            //    {
-            //        EncryptionKeyIndex = 0;
-            //        Key = UpdateKey(Key, UnencryptedScript[CurrentOffset - 1]);
-            //    }
-            //}
+            //Next, we include the decryption key, which we will make it
+            //just full of null bytes, because we don't need to put anything
+            //specific to it, since the game's decryption process will always be
+            //the same no matter what
+            byte[] Key = new byte[16];
+            Key.Initialize();
 
-            //return EncryptedScript;
-            return null;
+            //We now create the final unencrypted script, which will contain the magic signature, encryption key, and the unencrypted script
+            byte[] FinalUnencryptedScript = new byte[MagicSignature.Length + Key.Length + UnencryptedScript.Length];
+            Buffer.BlockCopy(MagicSignature, 0, FinalUnencryptedScript, 0, MagicSignature.Length);
+            Buffer.BlockCopy(Key, 0, FinalUnencryptedScript, MagicSignature.Length, Key.Length);
+            Buffer.BlockCopy(UnencryptedScript, 0, FinalUnencryptedScript, MagicSignature.Length + Key.Length, UnencryptedScript.Length);
+
+            //Now we can start the encryption process, which will be done by XORing the unencrypted script with the key
+            byte[] EncryptedScript = new byte[FinalUnencryptedScript.Length];
+            Buffer.BlockCopy(FinalUnencryptedScript, 0, EncryptedScript, 0, FinalUnencryptedScript.Length);
+
+            //The encryption process will start at the beginning of the unencrypted script
+            for (int CurrentOffset = MagicSignature.Length + Key.Length; CurrentOffset < EncryptedScript.Length; CurrentOffset++)
+            {
+                EncryptedScript[CurrentOffset] = (byte)(Key[EncryptionKeyIndex] ^ FinalUnencryptedScript[CurrentOffset]);
+                EncryptionKeyIndex++;
+
+                //Each 16 bytes, the key gets renewed
+                if (EncryptionKeyIndex == 16)
+                {
+                    EncryptionKeyIndex = 0;
+                    Key = UpdateKey(Key, FinalUnencryptedScript[CurrentOffset - 1]);
+                }
+            }
+
+            return EncryptedScript;
         }
     }
 }

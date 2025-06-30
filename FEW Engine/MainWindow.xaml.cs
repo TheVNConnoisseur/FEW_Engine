@@ -119,7 +119,8 @@ public partial class MainWindow : Window
                         {
                             string JSON = File.ReadAllText(FilePaths[CurrentFile], shiftJIS);
                             Dat dat = new Dat();
-                            dat.Encrypt(JSON);
+                            byte[] EncryptedFile = dat.Encrypt(dat.Compile(JSON));
+                            File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".dat", EncryptedFile);
                         }
                     }
                 }
