@@ -58,7 +58,7 @@ public partial class MainWindow : Window
                     string OriginalFileExtension = System.IO.Path.GetExtension(FilePaths[CurrentFile]);
 
                     //Check to see if the file is one that is not compatible with the program
-                    if (OriginalFileExtension != ".txt" && OriginalFileExtension != ".dat")
+                    if (OriginalFileExtension != ".json" && OriginalFileExtension != ".dat")
                     {
                         MessageBox.Show($"At least one of the selected files is not designed to be handled by this program, and thus" +
                             $" the conflicting files will not be processed.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -93,45 +93,33 @@ public partial class MainWindow : Window
                     Encoding shiftJIS = Encoding.GetEncoding("shift-jis");
 
                     //Check what name and extension the file has, in order to choose its corresponding class
-                    if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".dat"
-                        && System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_sce"))
+                    if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".dat")
                     {
-                        byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
-                        Dat dat = new Dat();
-                        byte[] DecryptedFile = dat.Decrypt(Data);
-                        var options = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
-                        string json = JsonSerializer.Serialize(dat.Parse(DecryptedFile), options);
-                        File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".json", json, shiftJIS);
-                    }
-
-                    if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".dat"
-                        && System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_define"))
-                    {
-                        byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
-                        Dat dat = new Dat();
-                        byte[] DecryptedFile = dat.Decrypt(Data);
-                        File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".dat", DecryptedFile);
-                        //File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".txt", dat.Parse(DecryptedFile), shiftJIS);
-                    }
-                    else if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".txt"
-                        && System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_sce"))
-                    {
-                        //It checks to see if the raw binary data of the script that is unparsed is present in the same
-                        //directory
-                        if (System.IO.File.Exists(
-                            System.IO.Path.GetDirectoryName(FilePaths[CurrentFile])
-                            + "\\" + System.IO.Path.GetFileNameWithoutExtension(FileNames[CurrentFile]) + "_metadata.dat"))
+                        if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_sce"))
                         {
-                            string[] Data = File.ReadAllLines(FilePaths[CurrentFile], shiftJIS);
-                            byte[] BinaryInstructions = File.ReadAllBytes(System.IO.Path.GetDirectoryName(FilePaths[CurrentFile])
-                            + "\\" + System.IO.Path.GetFileNameWithoutExtension(FileNames[CurrentFile]) + "_metadata.dat");
+                            byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
                             Dat dat = new Dat();
-                            File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".dat", dat.Encrypt(Data, BinaryInstructions));
+                            byte[] DecryptedFile = dat.Decrypt(Data);
+                            var options = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
+                            string json = JsonSerializer.Serialize(dat.Parse(DecryptedFile), options);
+                            File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".json", json, shiftJIS);
                         }
-                        else
+                        else if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_define"))
                         {
-                            throw new Exception("The metadata file for the reconstruction of the compressed files" +
-                                        " is missing, make sure to regenerate it by uncompressing again the original files");
+                            byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
+                            Dat dat = new Dat();
+                            byte[] DecryptedFile = dat.Decrypt(Data);
+                            File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".dat", DecryptedFile);
+                            //File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".txt", dat.Parse(DecryptedFile), shiftJIS);
+                        }
+                    }
+                    else if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".json")
+                    {
+                        if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_sce"))
+                        {
+                            string JSON = File.ReadAllText(FilePaths[CurrentFile], shiftJIS);
+                            Dat dat = new Dat();
+                            dat.Encrypt(JSON);
                         }
                     }
                 }

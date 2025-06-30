@@ -4,6 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading.Tasks;
 
 namespace FEW_Engine
@@ -2840,77 +2843,34 @@ namespace FEW_Engine
         }
 
         //Function that recreates and encrypts back the decrypted script
-        public byte[] Encrypt(string[] Data, byte[] BinaryInstructions)
+        public byte[] Encrypt(string JSON)
         {
-            //First we initialize the header, which is always the same
-            byte[] Header = { 0x00, 0x00, 0x00, 0x01 };
-
-            //Next, we include the decryption key, which we will make it
-            //just full of null bytes, because we don't need to put anything
-            //specific to it, since the game's decryption process will always be
-            //the same no matter what
-            byte[] Key = new byte[16];
-            Key.Initialize();
-
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            Encoding shiftJIS = Encoding.GetEncoding("shift-jis");
-            List<byte> ScriptLines = new List<byte>();
-
-            //We change the line termination \r\n bytes for a null byte
-            for (int CurrentLine = 0; CurrentLine < Data.Length; CurrentLine++)
+            var options = new JsonSerializerOptions
             {
-                Data[CurrentLine] = Data[CurrentLine].Replace("\r\n", "");
-                byte[] LineBytes = shiftJIS.GetBytes(Data[CurrentLine]);
-                ScriptLines.AddRange(LineBytes);
-                ScriptLines.Add(0x00);
-            }
-            ScriptLines.RemoveAt(ScriptLines.LastIndexOf(0x00));
-
-            byte[] Script = ScriptLines.ToArray();
-
-            byte[] OffsetScript = BitConverter.GetBytes(BinaryInstructions.Length);
-
-            int SizeFinalScript = Header.Length + Key.Length + BinaryInstructions.Length + Script.Length;
-
-            //The script expects to end the script with a value divisible by 4,
-            //so in order to do that, it adds null bytes at the footer in order
-            //to comply with this requirement.
-            //In case that the file size does not end up being divisible by 4, we
-            //simply calculate the number of bytes necessary to create a compatible
-            //script
-            if (SizeFinalScript % 4 != 0)
-            {
-                SizeFinalScript = SizeFinalScript + (4 - ((SizeFinalScript % 4)) % 4);
-            }
-
-            byte[] UnencryptedScript = new byte[SizeFinalScript];
-            UnencryptedScript.Initialize();
-
-            Buffer.BlockCopy(Header, 0, UnencryptedScript, 0, Header.Length);
-            Buffer.BlockCopy(Key, 0, UnencryptedScript, Header.Length, Key.Length);
-            Buffer.BlockCopy(BinaryInstructions, 0, UnencryptedScript, Header.Length + Key.Length, BinaryInstructions.Length);
-            Buffer.BlockCopy(OffsetScript, 0, UnencryptedScript, Header.Length + Key.Length + 4, OffsetScript.Length);
-            Buffer.BlockCopy(Script, 0, UnencryptedScript, Header.Length + Key.Length + BinaryInstructions.Length, Script.Length);
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+            };
+            instructions = JsonSerializer.Deserialize<List<Instruction>>(JSON, options) ?? new List<Instruction>();
 
             //The actual encryption process is a standard XOR one with the key set in place
             int EncryptionKeyIndex = 0;
 
-            byte[] EncryptedScript = new byte[UnencryptedScript.Length];
-            Buffer.BlockCopy(UnencryptedScript, 0, EncryptedScript, 0, Header.Length + Key.Length);
-            for (int CurrentOffset = Header.Length + Key.Length; CurrentOffset < UnencryptedScript.Length; CurrentOffset++)
-            {
-                EncryptedScript[CurrentOffset] = (byte)(Key[EncryptionKeyIndex] ^ UnencryptedScript[CurrentOffset]);
-                EncryptionKeyIndex++;
+            //byte[] EncryptedScript = new byte[UnencryptedScript.Length];
+            //Buffer.BlockCopy(UnencryptedScript, 0, EncryptedScript, 0, Header.Length + Key.Length);
+            //for (int CurrentOffset = Header.Length + Key.Length; CurrentOffset < UnencryptedScript.Length; CurrentOffset++)
+            //{
+            //    EncryptedScript[CurrentOffset] = (byte)(Key[EncryptionKeyIndex] ^ UnencryptedScript[CurrentOffset]);
+            //    EncryptionKeyIndex++;
 
-                //Each 16 bytes, the key gets renewed
-                if (EncryptionKeyIndex == 16)
-                {
-                    EncryptionKeyIndex = 0;
-                    Key = UpdateKey(Key, UnencryptedScript[CurrentOffset - 1]);
-                }
-            }
+            //    //Each 16 bytes, the key gets renewed
+            //    if (EncryptionKeyIndex == 16)
+            //    {
+            //        EncryptionKeyIndex = 0;
+            //        Key = UpdateKey(Key, UnencryptedScript[CurrentOffset - 1]);
+            //    }
+            //}
 
-            return EncryptedScript;
+            //return EncryptedScript;
+            return null;
         }
     }
 }
