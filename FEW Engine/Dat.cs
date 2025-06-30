@@ -2850,7 +2850,344 @@ namespace FEW_Engine
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
             };
             instructions = JsonSerializer.Deserialize<List<Instruction>>(JSON, options) ?? new List<Instruction>();
-            return null;
+
+            List<byte> CompiledScript = new List<byte>();
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            Encoding shiftJIS = Encoding.GetEncoding("shift-jis");
+
+            for (int CurrentInstruction = 0; CurrentInstruction < CompiledScript.Count; CurrentInstruction++)
+            {
+                switch (instructions[CurrentInstruction].Type)
+                {
+                    case "VideoStart":
+                        {
+                            CompiledScript.Add(0x02);
+                            CompiledScript.AddRange(shiftJIS.GetBytes(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    case "VideoStartAnime":
+                        {
+                            CompiledScript.Add(0x03);
+                            CompiledScript.AddRange(shiftJIS.GetBytes(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    case "VideoEnd":
+                        {
+                            CompiledScript.Add(0x04);
+                            break;
+                        }
+                    //TO DO
+                    case "Goto":
+                        {
+                            CompiledScript.Add(0xB);
+                            break;
+                        }
+                    //TO DO
+                    case "Gosub":
+                        {
+                            CompiledScript.Add(0xC);
+                            break;
+                        }
+                    case "MacroEnd":
+                        {
+                            CompiledScript.Add(0xD);
+                            break;
+                        }
+                    case "Movie":
+                        {
+                            CompiledScript.Add(0xE);
+                            CompiledScript.Add(0x74);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 5; CurrentArgument++)
+                            {
+                                short InstructionValue = short.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(InstructionValue));
+                            }
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[5]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[5]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+
+                            CompiledScript.Add(0xB8);
+                            CompiledScript.Add(0x78);
+                            break;
+                        }
+                    case "SkipStop":
+                        {
+                            CompiledScript.Add(0xE);
+                            break;
+                        }
+                    case "SaveStatus":
+                        {
+                            CompiledScript.Add(0x14);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "AutoSave":
+                        {
+                            CompiledScript.Add(0x15);
+                            break;
+                        }
+                    //TO DO
+                    case "FlagAdd":
+                        {
+                            CompiledScript.Add(0x19);
+                            break;
+                        }
+                    //TO DO
+                    case "FlagSub":
+                        {
+                            CompiledScript.Add(0x1A);
+                            break;
+                        }
+                    //TO DO
+                    case "FlagMul":
+                        {
+                            CompiledScript.Add(0x1B);
+                            break;
+                        }
+                    //TO DO
+                    case "FlagDiv":
+                        {
+                            CompiledScript.Add(0x1C);
+                            break;
+                        }
+                    //TO DO
+                    case "FlagExc":
+                        {
+                            CompiledScript.Add(0x1D);
+                            break;
+                        }
+                    //TO DO THERE ARE TWO CASES BUT ONE HAS NO TYPE
+                    case "0x1E??????":
+                        {
+                            CompiledScript.Add(0x1E);
+                            break;
+                        }
+                    //TO DO THERE ARE TWO CASES BUT ONE HAS NO TYPE
+                    case "FlagSet":
+                        {
+                            CompiledScript.Add(0x1E);
+                            break;
+                        }
+                    //TO DO
+                    case "StringSet":
+                        {
+                            CompiledScript.Add(0x1F);
+                            break;
+                        }
+                    //TO DO
+                    case "S2SSet":
+                        {
+                            CompiledScript.Add(0x20);
+                            break;
+                        }
+                    //TO DO
+                    case "S2SConnect":
+                        {
+                            CompiledScript.Add(0x21);
+                            break;
+                        }
+                    //TO DO
+                    case "S2TextConnect":
+                        {
+                            CompiledScript.Add(0x22);
+                            break;
+                        }
+                    //TO DO
+                    case "FlagRand":
+                        {
+                            CompiledScript.Add(0x23);
+                            break;
+                        }
+                    case "FlagCg":
+                        {
+                            CompiledScript.Add(0x24);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    //TO DO
+                    case "FlagCheck":
+                        {
+                            CompiledScript.Add(0x25); //0x26 or 0x27 or 0x28 or 0x29 or 0x2A
+                            break;
+                        }
+                    //TO DO
+                    case "FlagCheckGosub":
+                        {
+                            CompiledScript.Add(0x2B); //0x2C or 0x2D or 0x2E or 0x2F or 0x30
+                            break;
+                        }
+                    //TO DO
+                    case "F2FAdd":
+                        {
+                            CompiledScript.Add(0x31);
+                            break;
+                        }
+                    //TO DO
+                    case "F2FSub":
+                        {
+                            CompiledScript.Add(0x32);
+                            break;
+                        }
+                    //TO DO
+                    case "F2FMul":
+                        {
+                            CompiledScript.Add(0x33);
+                            break;
+                        }
+                    //TO DO
+                    case "F2FDiv":
+                        {
+                            CompiledScript.Add(0x34);
+                            break;
+                        }
+                    //TO DO
+                    case "F2FExc":
+                        {
+                            CompiledScript.Add(0x35);
+                            break;
+                        }
+                    //TO DO
+                    case "F2FSet":
+                        {
+                            CompiledScript.Add(0x36);
+                            break;
+                        }
+                    //TO DO
+                    case "F2FRand":
+                        {
+                            CompiledScript.Add(0x37);
+                            break;
+                        }
+                    //TO DO
+                    case "F2FCheck":
+                        {
+                            CompiledScript.Add(0x38); //or 0x39 or 0x3A or 0x3B or 0x3C or 3D
+                            break;
+                        }
+                    case "CgFull":
+                        {
+                            CompiledScript.Add(0x46);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "CgFullClear":
+                        {
+                            CompiledScript.Add(0x47);
+                            break;
+                        }
+                    case "CgMid":
+                        {
+                            CompiledScript.Add(0x48);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[1])));
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[2]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[2]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "CgMidAuto":
+                        {
+                            CompiledScript.Add(0x49);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[1]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[1]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "CgMidMove":
+                        {
+                            CompiledScript.Add(0x4A);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[1])));
+                            break;
+                        }
+                }
+            }
+
+            return CompiledScript.ToArray();
         }
 
         //Function that recreates and encrypts back the decrypted script
