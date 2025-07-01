@@ -2677,7 +2677,6 @@ namespace FEW_Engine
                         {
                             instruction.Type = "MemoryLoad";
                             currentOffset++;
-
                             break;
                         }
                     case 0xB5:
@@ -3241,11 +3240,15 @@ namespace FEW_Engine
                             CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
-                    //TO DO
                     case "CModeFlash":
                         {
                             CompiledScript.Add(0x4F);
 
+                            for (int CurrentArgument = 0; CurrentArgument < 7; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
                     case "EffectFlash":
@@ -3803,6 +3806,209 @@ namespace FEW_Engine
                             else
                             {
                                 CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "TextDraw":
+                        {
+                            CompiledScript.Add(0x90);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 4; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+                            break;
+                        }
+                    case "TextDrawDefault":
+                        {
+                            CompiledScript.Add(0x91);
+                            break;
+                        }
+                    //TO DO
+                    case "TextDrawFlag":
+                        {
+                            CompiledScript.Add(0x92);
+                            break;
+                        }
+                    case "CgLoad":
+                        {
+                            CompiledScript.Add(0x93);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                int.Parse(instructions[CurrentInstruction].Arguments[0])));
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[1]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[1]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "CgUnLoad":
+                        {
+                            CompiledScript.Add(0x94);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                int.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            break;
+                        }
+                    case "CgDrawInit":
+                        {
+                            CompiledScript.Add(0x95);
+                            break;
+                        }
+                    //TO DO
+                    case "CgInitRect":
+                        {
+                            CompiledScript.Add(0x96);
+                            break;
+                        }
+                    case "CgDraw":
+                        {
+                            CompiledScript.Add(0x97);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    //TO DO
+                    case "CgShow":
+                        {
+                            CompiledScript.Add(0x98);
+                            break;
+                        }
+                    //TO DO
+                    case "CgDrawKey":
+                        {
+                            CompiledScript.Add(0x99);
+                            break;
+                        }
+                    //TO DO
+                    case "CgDrawColorDodge":
+                        {
+                            CompiledScript.Add(0x9A);
+                            break;
+                        }
+                    //TO DO
+                    case "CgDrawBlendPattern":
+                        {
+                            CompiledScript.Add(0x9B);
+                            break;
+                        }
+                    case "DrawMessageWindow":
+                        {
+                            CompiledScript.Add(0x9C);
+                            break;
+                        }
+                    //TO DO
+                    case "SaveGetDate":
+                        {
+                            CompiledScript.Add(0x9D);
+                            break;
+                        }
+                    //TO DO
+                    case "SaveGetTitle":
+                        {
+                            CompiledScript.Add(0x9E);
+                            break;
+                        }
+                    //TO DO
+                    case "SaveGetMemo":
+                        {
+                            CompiledScript.Add(0x9F);
+                            break;
+                        }
+                    //TO DO
+                    case "ConfigGetEffect":
+                        {
+                            CompiledScript.Add(0xA0);
+                            break;
+                        }
+                    //TO DO
+                    case "SkipGet":
+                        {
+                            CompiledScript.Add(0xA1);
+                            break;
+                        }
+                    //TO DO
+                    case "CtrlGet":
+                        {
+                            CompiledScript.Add(0xA2);
+                            break;
+                        }
+                    case "MemoryLoad":
+                        {
+                            CompiledScript.Add(0xA3);
+                            break;
+                        }
+                    case "CharEvent":
+                        {
+                            CompiledScript.Add(0xB5);
+                            break;
+                        }
+                    case "EventStart":
+                        {
+                            CompiledScript.Add(0xB7);
+                            break;
+                        }
+                    case "KeyWaitMovie":
+                        {
+                            CompiledScript.Add(0xB8);
+                            break;
+                        }
+                    case "KeyWait":
+                        {
+                            CompiledScript.Add(0xB9);
+                            break;
+                        }
+                    case "SelectPrint":
+                        {
+                            CompiledScript.Add(0xC8);
+
+                            CompiledScript.Add((byte)instructions[CurrentInstruction].Arguments.Count);
+                            for (int CurrentArgument = 0; CurrentArgument < instructions[CurrentInstruction].Arguments.Count; CurrentArgument++)
+                            {
+                                //We check to see if the string is already in the list of strings
+                                int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                    instructions[CurrentInstruction].Arguments[CurrentArgument]);
+                                //If it is not, we add it to the list of strings and add the position of the string in the list
+                                if (StringPosition != -1)
+                                {
+                                    strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
+                                    CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                }
+                                else
+                                {
+                                    CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                }
+                            }
+
+                            break;
+                        }
+                    case "SelectDefault":
+                        {
+                            CompiledScript.Add(0xC9);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    case "Program":
+                        {
+                            CompiledScript.Add(0xF0);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
                             }
                             break;
                         }
