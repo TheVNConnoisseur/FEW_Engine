@@ -2856,20 +2856,20 @@ namespace FEW_Engine
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding shiftJIS = Encoding.GetEncoding("shift-jis");
 
-            for (int CurrentInstruction = 0; CurrentInstruction < CompiledScript.Count; CurrentInstruction++)
+            for (int CurrentInstruction = 0; CurrentInstruction < instructions.Count; CurrentInstruction++)
             {
                 switch (instructions[CurrentInstruction].Type)
                 {
                     case "VideoStart":
                         {
                             CompiledScript.Add(0x02);
-                            CompiledScript.AddRange(shiftJIS.GetBytes(instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
                     case "VideoStartAnime":
                         {
                             CompiledScript.Add(0x03);
-                            CompiledScript.AddRange(shiftJIS.GetBytes(instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
                     case "VideoEnd":
@@ -3182,6 +3182,134 @@ namespace FEW_Engine
 
                             CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
                             CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[1])));
+                            break;
+                        }
+                    case "CgMidXY":
+                        {
+                            CompiledScript.Add(0x4B);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[1])));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[2])));
+                            break;
+                        }
+                    //TO DO
+                    case "GetMiddlePos":
+                        {
+                            CompiledScript.Add(0x4C); //or 0x39 or 0x3A or 0x3B or 0x3C or 3D
+                            break;
+                        }
+                    case "CgFullMidClear":
+                        {
+                            CompiledScript.Add(0x4D);
+                            CompiledScript.AddRange(new byte[] { 0x00, 0x4D, 0x01, 0x4D, 0x02, 0x4D, 0x03, 0x4D, 0x05,
+                                0x4D, 0x06, 0x4D, 0x07, 0x4D, 0x08, 0x4D, 0x09, 0x46 });
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "CgMidClearAll":
+                        {
+                            CompiledScript.Add(0x4D);
+                            CompiledScript.AddRange(new byte[] { 0x00, 0x4D, 0x01, 0x4D, 0x02, 0x4D, 0x03, 0x4D, 0x05,
+                                0x4D, 0x06, 0x4D, 0x07, 0x4D, 0x08, 0x4D, 0x09 });
+                            break;
+                        }
+                    case "CgMidClear":
+                        {
+                            CompiledScript.Add(0x4D);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    //TO DO (0x4E is done correctly, but EFFECT uses more opcodes)
+                    case "Effect":
+                        {
+                            CompiledScript.Add(0x4E);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    //TO DO
+                    case "CModeFlash":
+                        {
+                            CompiledScript.Add(0x4F);
+
+                            break;
+                        }
+                    case "EffectFlash":
+                        {
+                            CompiledScript.Add(0x50);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                short.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            break;
+                        }
+                    //TO DO
+                    case "EffectShake":
+                        {
+                            CompiledScript.Add(0x51);
+
+                            break;
+                        }
+                    //TO DO
+                    case "EffectPattern":
+                        {
+                            CompiledScript.Add(0x52);
+
+                            break;
+                        }
+                    case "EffectScroll":
+                        {
+                            CompiledScript.Add(0x53);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                short.Parse(instructions[CurrentInstruction].Arguments[0])));
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "EFE":
+                        {
+                            CompiledScript.Add(0x54);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    case "EffectEnvStop":
+                        {
+                            CompiledScript.Add(0x55);
+                            break;
+                        }
+                    case "EffectEnvStopNoCreate":
+                        {
+                            CompiledScript.Add(0x56);
                             break;
                         }
                 }
