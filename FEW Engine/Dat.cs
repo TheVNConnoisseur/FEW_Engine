@@ -2152,7 +2152,6 @@ namespace FEW_Engine
 
                             instruction.Arguments.Add(Convert.ToString(Data[currentOffset]));
                             currentOffset++;
-
                             break;
                         }
                     case 0x71:
@@ -2901,8 +2900,7 @@ namespace FEW_Engine
 
                             for (int CurrentArgument = 0; CurrentArgument < 5; CurrentArgument++)
                             {
-                                short InstructionValue = short.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument]);
-                                CompiledScript.AddRange(BitConverter.GetBytes(InstructionValue));
+                                CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
                             }
 
                             //We check to see if the string is already in the list of strings
@@ -3281,12 +3279,12 @@ namespace FEW_Engine
 
                             //We check to see if the string is already in the list of strings
                             int StringPosition = CompilerHelper.GetPositionStringList(strings,
-                                instructions[CurrentInstruction].Arguments[0]);
+                                instructions[CurrentInstruction].Arguments[1]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
                             if (StringPosition != -1)
                             {
-                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                strings.Add(instructions[CurrentInstruction].Arguments[1]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
                             }
                             else
@@ -3310,6 +3308,502 @@ namespace FEW_Engine
                     case "EffectEnvStopNoCreate":
                         {
                             CompiledScript.Add(0x56);
+                            break;
+                        }
+                    case "ColorFill":
+                        {
+                            CompiledScript.Add(0x57);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 3; CurrentArgument++)
+                            {
+                                CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
+                            for (int CurrentArgument = 3; CurrentArgument < 5; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+                            break;
+                        }
+                    case "ColorModeNone":
+                        {
+                            CompiledScript.Add(0x58);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[1]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[2]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[3]));
+                            break;
+                        }
+                    case "ColorModeDark":
+                        {
+                            CompiledScript.Add(0x58);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[1]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[2]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[3]));
+                            break;
+                        }
+                    case "ColorModeLight":
+                        {
+                            CompiledScript.Add(0x58);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[1]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[2]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[3]));
+                            break;
+                        }
+                    case "ColorModeSepia":
+                        {
+                            CompiledScript.Add(0x58);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[1]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[2]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[3]));
+                            break;
+                        }
+                    case "ColorModeMono":
+                        {
+                            CompiledScript.Add(0x58);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[1]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[2]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[3]));
+                            break;
+                        }
+                    case "ColorMode":
+                        {
+                            CompiledScript.Add(0x58);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[1]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[2]));
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[3]));
+                            break;
+                        }
+                    case "EffectEnvLoadAlpha":
+                        {
+                            CompiledScript.Add(0x59);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "MusicPlay":
+                        {
+                            CompiledScript.Add(0x5A);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    case "MusicStop":
+                        {
+                            CompiledScript.Add(0x5B);
+                            break;
+                        }
+                    case "MusicStopFade":
+                        {
+                            CompiledScript.Add(0x5C);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            break;
+                        }
+                    case "SoundEffectPlay":
+                        {
+                            CompiledScript.Add(0x5D);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "SoundEffectPlayLoop":
+                        {
+                            CompiledScript.Add(0x5E);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "SoundEffectPlayLoopStop":
+                        {
+                            CompiledScript.Add(0x5F);
+                            break;
+                        }
+                    case "SoundEffectPlayLoopABCD":
+                        {
+                            CompiledScript.Add(0x60);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(instructions[CurrentInstruction].Arguments[0])));
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[1]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[1]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "SoundEffectPlayLoopStopABCD":
+                        {
+                            CompiledScript.Add(0x61);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            break;
+                        }
+                    case "SoundEffectPlayLoopStopABCDALL":
+                        {
+                            CompiledScript.Add(0x62);
+                            break;
+                        }
+                    case "SoundEffectPitch":
+                        {
+                            CompiledScript.Add(0x63);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "SoundEffectPitchDefault":
+                        {
+                            CompiledScript.Add(0x64);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    //TO DO
+                    case "Sleep":
+                        {
+                            CompiledScript.Add(0x69);
+                            break;
+                        }
+                    case "AnimeFullOn":
+                        {
+                            CompiledScript.Add(0x6A);
+                            break;
+                        }
+                    case "AnimeFullOff":
+                        {
+                            CompiledScript.Add(0x6B);
+                            break;
+                        }
+                    case "AnimeMepachiOn":
+                        {
+                            CompiledScript.Add(0x6C);
+                            break;
+                        }
+                    case "AnimeMepachiOff":
+                        {
+                            CompiledScript.Add(0x6D);
+                            break;
+                        }
+                    case "AnimeKutiOn":
+                        {
+                            CompiledScript.Add(0x6E);
+                            break;
+                        }
+                    case "AnimeKutiOff":
+                        {
+                            CompiledScript.Add(0x6F);
+                            break;
+                        }
+                    case "FontSize":
+                        {
+                            CompiledScript.Add(0x70);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    case "FontChange":
+                        {
+                            CompiledScript.Add(0x71);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "FontSetName":
+                        {
+                            CompiledScript.Add(0x72);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "FontReset":
+                        {
+                            CompiledScript.Add(0x73);
+                            break;
+                        }
+                    case "PlayCutMovie":
+                        {
+                            CompiledScript.Add(0x74);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 5; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    short.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[5]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[5]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "PlayCutMovieLoop":
+                        {
+                            CompiledScript.Add(0x75);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 5; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    short.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[5]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[5]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
+                            break;
+                        }
+                    case "PlayMovieRateSet":
+                        {
+                            CompiledScript.Add(0x76);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                    short.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[1])));
+                            break;
+                        }
+                    case "PlayMoviePause":
+                        {
+                            CompiledScript.Add(0x77);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                    short.Parse(instructions[CurrentInstruction].Arguments[0])));
+                            break;
+                        }
+                    case "ReleaseMovie":
+                        {
+                            CompiledScript.Add(0x78);
+                            break;
+                        }
+                    case "AntiAliasSet":
+                        {
+                            CompiledScript.Add(0x7B);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    case "MessageWindowSet":
+                        {
+                            CompiledScript.Add(0x7C);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            break;
+                        }
+                    case "SetMepachiTime":
+                        {
+                            CompiledScript.Add(0x7D);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 3; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+                            break;
+                        }
+                    case "EventInit":
+                        {
+                            CompiledScript.Add(0x7E);
+                            break;
+                        }
+                    case "EventSet":
+                        {
+                            CompiledScript.Add(0x7F);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 6; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+                            break;
+                        }
+                    //TO DO
+                    case "timeGetTime":
+                        {
+                            CompiledScript.Add(0x80);
+                            break;
+                        }
+                    //TO DO
+                    case "GetSEPPlayNow":
+                        {
+                            CompiledScript.Add(0x81);
+                            break;
+                        }
+                    case "TextInit":
+                        {
+                            CompiledScript.Add(0x8C);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+                            break;
+                        }
+                    case "TextOutSet":
+                        {
+                            CompiledScript.Add(0x8D);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 4; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+                            break;
+                        }
+                    //TO DO
+                    case "TextOut":
+                        {
+                            CompiledScript.Add(0x8E);
+                            break;
+                        }
+                    case "TextOutDefault":
+                        {
+                            CompiledScript.Add(0x8F);
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
                             break;
                         }
                 }
