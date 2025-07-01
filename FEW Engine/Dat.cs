@@ -399,7 +399,8 @@ namespace FEW_Engine
                         }
                     case 0x1E:
                         {
-                            currentOffset++; //We cannot confirm the instruction type yet
+                            instruction.Type = "Unknown 0x1E"; //We cannot know the name of this instruction, but it is related to macros
+                            currentOffset++;
 
                             if (Data[currentOffset + 3] == 0x41)
                             {
@@ -432,6 +433,7 @@ namespace FEW_Engine
                         }
                     case 0x1F:
                         {
+                            //There is another unknown opcode related to the unknown 0x1E opcode, but since that one cannot even be understood with a compiled script, it will be ignored
                             instruction.Type = "StringSet";
                             currentOffset++;
 
@@ -457,6 +459,7 @@ namespace FEW_Engine
                         }
                     case 0x20:
                         {
+                            //There is another unknown opcode related to the unknown 0x1E opcode, but since that one cannot even be understood with a compiled script, it will be ignored
                             instruction.Type = "S2SSet"; //or S2SS
                             currentOffset++;
 
@@ -1253,7 +1256,7 @@ namespace FEW_Engine
                         }
                     case 0x36:
                         {
-                            instruction.Type = "F2FSet";
+                            instruction.Type = "F2FSet"; //There is another unknown opcode related to the unknown 0x1E opcode, but since that one cannot even be understood with a compiled script, it will be ignored
                             currentOffset++;
 
                             for (int currentArgument = 0; currentArgument < 2; currentArgument++)
@@ -2951,46 +2954,64 @@ namespace FEW_Engine
                             CompiledScript.Add(0x15);
                             break;
                         }
-                    //TO DO
                     case "FlagAdd":
                         {
                             CompiledScript.Add(0x19);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
-                    //TO DO
                     case "FlagSub":
                         {
                             CompiledScript.Add(0x1A);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
-                    //TO DO
                     case "FlagMul":
                         {
                             CompiledScript.Add(0x1B);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
-                    //TO DO
                     case "FlagDiv":
                         {
                             CompiledScript.Add(0x1C);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
-                    //TO DO
                     case "FlagExc":
                         {
                             CompiledScript.Add(0x1D);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
-                    //TO DO THERE ARE TWO CASES BUT ONE HAS NO TYPE
-                    case "0x1E??????":
-                        {
-                            CompiledScript.Add(0x1E);
-                            break;
-                        }
-                    //TO DO THERE ARE TWO CASES BUT ONE HAS NO TYPE
                     case "FlagSet":
                         {
                             CompiledScript.Add(0x1E);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
                     //TO DO
@@ -3017,10 +3038,18 @@ namespace FEW_Engine
                             CompiledScript.Add(0x22);
                             break;
                         }
-                    //TO DO
                     case "FlagRand":
                         {
                             CompiledScript.Add(0x23);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
+
+                            for (int CurrentArgument = 1; CurrentArgument < 3; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                    instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
                             break;
                         }
                     case "FlagCg":
@@ -3055,46 +3084,83 @@ namespace FEW_Engine
                             CompiledScript.Add(0x2B); //0x2C or 0x2D or 0x2E or 0x2F or 0x30
                             break;
                         }
-                    //TO DO
                     case "F2FAdd":
                         {
                             CompiledScript.Add(0x31);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
-                    //TO DO
                     case "F2FSub":
                         {
                             CompiledScript.Add(0x32);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
-                    //TO DO
                     case "F2FMul":
                         {
                             CompiledScript.Add(0x33);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
-                    //TO DO
                     case "F2FDiv":
                         {
                             CompiledScript.Add(0x34);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
-                    //TO DO
                     case "F2FExc":
                         {
                             CompiledScript.Add(0x35);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
-                    //TO DO
                     case "F2FSet":
                         {
                             CompiledScript.Add(0x36);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
                     //TO DO
                     case "F2FRand":
                         {
                             CompiledScript.Add(0x37);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                    instructions[CurrentInstruction].Arguments[1])));
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[2]));
                             break;
                         }
                     //TO DO
