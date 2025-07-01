@@ -13,5 +13,34 @@ namespace FEW_Engine
         {
             return strings.IndexOf(NewString);
         }
+
+        //This function will basically encode the parameters given in the argument. In this case it basically works in the
+        //opposite way of the GetParameters function in the DecrypterHelper class.
+        public static List<byte> EncodeParameters(string argument)
+        {
+            var bytes = new List<byte>();
+
+            if (argument.StartsWith("g"))
+            {
+                bytes.Add(0x3F);
+                short value = short.Parse(argument.Substring(1));
+                bytes.AddRange(BitConverter.GetBytes(value));
+            }
+            else if (argument.StartsWith("f"))
+            {
+                bytes.Add(0x3E);
+                short value = short.Parse(argument.Substring(1));
+                bytes.AddRange(BitConverter.GetBytes(value));
+            }
+            else
+            {
+                bytes.Add(0x41);
+                int value = int.Parse(argument);
+                bytes.AddRange(BitConverter.GetBytes(value));
+            }
+
+            return bytes;
+        }
+
     }
 }

@@ -3545,10 +3545,12 @@ namespace FEW_Engine
                             }
                             break;
                         }
-                    //TO DO
                     case "Sleep":
                         {
                             CompiledScript.Add(0x69);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
                     case "AnimeFullOn":
@@ -3749,16 +3751,20 @@ namespace FEW_Engine
                             }
                             break;
                         }
-                    //TO DO
                     case "timeGetTime":
                         {
                             CompiledScript.Add(0x80);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
-                    //TO DO
                     case "GetSEPPlayNow":
                         {
                             CompiledScript.Add(0x81);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
                     case "TextInit":
@@ -3825,10 +3831,21 @@ namespace FEW_Engine
                             CompiledScript.Add(0x91);
                             break;
                         }
-                    //TO DO
                     case "TextDrawFlag":
                         {
                             CompiledScript.Add(0x92);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
+
+                            for (int CurrentArgument = 2; CurrentArgument < 4; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
                             break;
                         }
                     case "CgLoad":
@@ -3867,10 +3884,15 @@ namespace FEW_Engine
                             CompiledScript.Add(0x95);
                             break;
                         }
-                    //TO DO
                     case "CgInitRect":
                         {
                             CompiledScript.Add(0x96);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 4; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
                     case "CgDraw":
@@ -3880,28 +3902,54 @@ namespace FEW_Engine
                             CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
-                    //TO DO
                     case "CgShow":
                         {
                             CompiledScript.Add(0x98);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 4; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
-                    //TO DO
                     case "CgDrawKey":
                         {
                             CompiledScript.Add(0x99);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+
+                            for (int CurrentArgument = 1; CurrentArgument < 7; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
-                    //TO DO
                     case "CgDrawColorDodge":
                         {
                             CompiledScript.Add(0x9A);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+
+                            for (int CurrentArgument = 1; CurrentArgument < 7; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
-                    //TO DO
                     case "CgDrawBlendPattern":
                         {
                             CompiledScript.Add(0x9B);
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[0])));
+
+                            for (int CurrentArgument = 1; CurrentArgument < 9; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                            }
                             break;
                         }
                     case "DrawMessageWindow":
@@ -3927,22 +3975,25 @@ namespace FEW_Engine
                             CompiledScript.Add(0x9F);
                             break;
                         }
-                    //TO DO
                     case "ConfigGetEffect":
                         {
                             CompiledScript.Add(0xA0);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters(instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
-                    //TO DO
                     case "SkipGet":
                         {
                             CompiledScript.Add(0xA1);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters(instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
-                    //TO DO
                     case "CtrlGet":
                         {
                             CompiledScript.Add(0xA2);
+
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters(instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
                     case "MemoryLoad":
