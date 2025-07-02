@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -2945,6 +2944,7 @@ namespace FEW_Engine
                         }
                     case 0xE6:
                         {
+                            instruction.Type = "Dialogue"; //Unofficial name
                             currentOffset++; //There is no name for some instructions apparently, so we cannot name it
 
                             instruction.Arguments.Add(
@@ -2969,6 +2969,7 @@ namespace FEW_Engine
                         }
                     case 0xE7:
                         {
+                            instruction.Type = "Dialogue"; //Unofficial name
                             currentOffset++; //There is no name for some instructions apparently, so we cannot name it
 
                             instruction.Arguments.Add(
@@ -2989,6 +2990,7 @@ namespace FEW_Engine
                         }
                     case 0xE8:
                         {
+                            instruction.Type = "Dialogue"; //Unofficial name
                             currentOffset++; //There is no name for some instructions apparently, so we cannot name it
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
@@ -3005,6 +3007,7 @@ namespace FEW_Engine
                         }
                     case 0xE9:
                         {
+                            instruction.Type = "Dialogue"; //Unofficial name
                             currentOffset++; //There is no name for some instructions apparently, so we cannot name it
 
                             int stringIndex = BitConverter.ToInt32(Data, currentOffset);
@@ -3037,6 +3040,10 @@ namespace FEW_Engine
             instructions = JsonSerializer.Deserialize<List<Instruction>>(JSON, options) ?? new List<Instruction>();
 
             List<byte> CompiledScript = new List<byte>();
+
+            //The instructions that are dialogue related do keep track of their number, and it starts from number 0, incrementing by 1
+            //each time a new instruction of dialogue is added.
+            int CurrentDialogueInstruction = 0;
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding shiftJIS = Encoding.GetEncoding("shift-jis");
@@ -3926,18 +3933,34 @@ namespace FEW_Engine
                                 short.Parse(instructions[CurrentInstruction].Arguments[0])));
                             break;
                         }
-                    //TO DO
                     case "EffectShake":
                         {
                             CompiledScript.Add(0x51);
 
+                            for (int CurrentArgument = 0; CurrentArgument < 4; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
                             break;
                         }
-                    //TO DO
                     case "EffectPattern":
                         {
                             CompiledScript.Add(0x52);
 
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[0]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                            }
                             break;
                         }
                     case "EffectScroll":
@@ -4827,6 +4850,111 @@ namespace FEW_Engine
                                 CompiledScript.AddRange(BitConverter.GetBytes(
                                     int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
                             }
+                            break;
+                        }
+                    case "Dialogue":
+                        {
+                            switch (instructions[CurrentInstruction].Arguments.Count)
+                            {
+                                case 1:
+                                    {
+                                        CompiledScript.Add(0xE9);
+
+                                        //We check to see if the string is already in the list of strings
+                                        int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                            instructions[CurrentInstruction].Arguments[0]);
+
+                                        //If it is not, we add it to the list of strings and add the position of the string in the list
+                                        if (StringPosition != -1)
+                                        {
+                                            strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                            CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                        }
+                                        else
+                                        {
+                                            CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                        }
+                                        break;
+                                    }
+                                case 2:
+                                    {
+                                        CompiledScript.Add(0xE8);
+
+                                        for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                                        {
+                                            //We check to see if the string is already in the list of strings
+                                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                                instructions[CurrentInstruction].Arguments[CurrentArgument]);
+
+                                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                                            if (StringPosition != -1)
+                                            {
+                                                strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
+                                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                            }
+                                            else
+                                            {
+                                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case 3:
+                                    {
+                                        CompiledScript.Add(0xE7);
+
+                                        CompiledScript.AddRange(BitConverter.GetBytes(
+                                            int.Parse(instructions[CurrentInstruction].Arguments[0])));
+
+                                        for (int CurrentArgument = 1; CurrentArgument < 3; CurrentArgument++)
+                                        {
+                                            //We check to see if the string is already in the list of strings
+                                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                                instructions[CurrentInstruction].Arguments[CurrentArgument]);
+
+                                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                                            if (StringPosition != -1)
+                                            {
+                                                strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
+                                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                            }
+                                            else
+                                            {
+                                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        CompiledScript.Add(0xE6);
+
+                                        CompiledScript.AddRange(BitConverter.GetBytes(
+                                            int.Parse(instructions[CurrentInstruction].Arguments[0])));
+
+                                        for (int CurrentArgument = 1; CurrentArgument < 4; CurrentArgument++)
+                                        {
+                                            //We check to see if the string is already in the list of strings
+                                            int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                                instructions[CurrentInstruction].Arguments[CurrentArgument]);
+
+                                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                                            if (StringPosition != -1)
+                                            {
+                                                strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
+                                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                            }
+                                            else
+                                            {
+                                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                            }
+                                        }
+                                        break;
+                                    }
+                            }
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(CurrentDialogueInstruction));
+                            CurrentDialogueInstruction++;
                             break;
                         }
                 }
