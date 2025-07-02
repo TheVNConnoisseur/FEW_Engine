@@ -42,5 +42,27 @@ namespace FEW_Engine
             return bytes;
         }
 
+        //This function will return yes or no depending on if the label exists already or not
+        public static bool ExistsLabel(List<Label> labels, string labelName)
+        {
+            foreach (var label in labels)
+            {
+                if (label.Name == labelName)
+                    return true;
+            }
+            return false;
+        }
+
+        //This function will return the label with the asked name alongside its information
+        public static Label GetLabel(List<Label> labels, string labelName)
+        {
+            foreach (var label in labels)
+            {
+                if (label.Name == labelName)
+                    return label;
+            }
+
+            throw new Exception("Label " + labelName + " not found");
+        }
     }
 }

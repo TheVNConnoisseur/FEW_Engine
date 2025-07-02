@@ -16,10 +16,12 @@ namespace FEW_Engine
         List<Instruction> instructions = new List<Instruction>();
         List<String> strings = new List<String>();
         List<Label> labels = new List<Label>();
+        List<Label> pendingLabels = new List<Label>();
         public Dat()
         {
             instructions.Clear();
             labels.Clear();
+            pendingLabels.Clear();
         }
 
         //Function that removes the decryption method used for the script
@@ -2878,16 +2880,50 @@ namespace FEW_Engine
                             CompiledScript.Add(0x04);
                             break;
                         }
-                    //TO DO
                     case "Goto":
                         {
                             CompiledScript.Add(0xB);
+
+                            bool hasAddress = CompilerHelper.ExistsLabel(labels, instructions[CurrentInstruction].Arguments[0]);
+
+                            if (hasAddress)
+                            {
+                                var existingLabel = CompilerHelper.GetLabel(labels, instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(existingLabel.Address));
+                            }
+                            else if (!hasAddress)
+                            {
+                                var newLabel = new Label
+                                {
+                                    Name = instructions[CurrentInstruction].Arguments[0],
+                                    Address = CompiledScript.Count
+                                };
+                                pendingLabels.Add(newLabel);
+                                CompiledScript.AddRange(new byte[4]); //Placeholder of 4 bytes
+                            }
                             break;
                         }
-                    //TO DO
                     case "Gosub":
                         {
                             CompiledScript.Add(0xC);
+
+                            bool hasAddress = CompilerHelper.ExistsLabel(labels, instructions[CurrentInstruction].Arguments[0]);
+
+                            if (hasAddress)
+                            {
+                                var existingLabel = CompilerHelper.GetLabel(labels, instructions[CurrentInstruction].Arguments[0]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(existingLabel.Address));
+                            }
+                            else if (!hasAddress)
+                            {
+                                var newLabel = new Label
+                                {
+                                    Name = instructions[CurrentInstruction].Arguments[0],
+                                    Address = CompiledScript.Count
+                                };
+                                pendingLabels.Add(newLabel);
+                                CompiledScript.AddRange(new byte[4]); //Placeholder of 4 bytes
+                            }
                             break;
                         }
                     case "MacroEnd":
@@ -3150,7 +3186,6 @@ namespace FEW_Engine
                             }
                             break;
                         }
-                    //TO DO
                     case "F2FRand":
                         {
                             CompiledScript.Add(0x37);
@@ -3313,7 +3348,7 @@ namespace FEW_Engine
                             for (int CurrentArgument = 0; CurrentArgument < 7; CurrentArgument++)
                             {
                                 CompiledScript.AddRange(BitConverter.GetBytes(
-                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument]));
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
                             }
                             break;
                         }
