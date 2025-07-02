@@ -64,5 +64,28 @@ namespace FEW_Engine
 
             throw new Exception("Label " + labelName + " not found");
         }
+
+        //This function is used to encode certain flags that are arguments in certain flags. While they don't seem to be pretty much different
+        //in theory from the rest, apparently they need to be encoded in a different way. Sadly, the analyzed game doesn't use any instruction
+        //that goes through this function, so it is not known how it works in practice. When we get a result of 0x45 in the end, we also need
+        //to write the entire argument to the string list, but that is done outside of this function.
+        public static byte[] EncodeStringParameters(string argument, int onlyStringFlagsAllowed)
+        {
+            var bytes = new List<byte>();
+
+            if (argument[0] == 's')
+            {
+                if (onlyStringFlagsAllowed != 1)
+                {
+                    bytes.Add(0x44);
+                }
+                bytes.AddRange(BitConverter.GetBytes(short.Parse(argument.Substring(1))));
+            }
+            else if (onlyStringFlagsAllowed == 1)
+            {
+                bytes.Add(0x45);
+            }
+            return bytes.ToArray();
+        }
     }
 }

@@ -3232,28 +3232,145 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
-                    //TO DO
                     case "StringSet":
                         {
                             CompiledScript.Add(0x1F);
+
+                            byte[] result = CompilerHelper.EncodeStringParameters
+                                    (instructions[CurrentInstruction].Arguments[0], 1);
+                            CompiledScript.AddRange(result);
+                            if (result[0] == 0x45)
+                            {
+
+                                //We check to see if the string is already in the list of strings
+                                int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                    instructions[CurrentInstruction].Arguments[0]);
+
+                                //If it is not, we add it to the list of strings and add the position of the string in the list
+                                if (StringPosition != -1)
+                                {
+                                    strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                    CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                }
+                                else
+                                {
+                                    CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                }
+                            }
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition1 = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[1]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition1 != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[1]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition1));
+                            }
                             break;
                         }
-                    //TO DO
                     case "S2SSet":
                         {
                             CompiledScript.Add(0x20);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                byte[] result = CompilerHelper.EncodeStringParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument], 1);
+                                CompiledScript.AddRange(result);
+                                if (result[0] == 0x45)
+                                {
+                                    //We check to see if the string is already in the list of strings
+                                    int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                        instructions[CurrentInstruction].Arguments[CurrentArgument]);
+
+                                    //If it is not, we add it to the list of strings and add the position of the string in the list
+                                    if (StringPosition != -1)
+                                    {
+                                        strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                    }
+                                    else
+                                    {
+                                        CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                    }
+                                }
+                            }
                             break;
                         }
-                    //TO DO
                     case "S2SConnect":
                         {
                             CompiledScript.Add(0x21);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 2; CurrentArgument++)
+                            {
+                                byte[] result = CompilerHelper.EncodeStringParameters
+                                    (instructions[CurrentInstruction].Arguments[CurrentArgument], 1);
+                                CompiledScript.AddRange(result);
+                                if (result[0] == 0x45)
+                                {
+                                    //We check to see if the string is already in the list of strings
+                                    int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                        instructions[CurrentInstruction].Arguments[CurrentArgument]);
+
+                                    //If it is not, we add it to the list of strings and add the position of the string in the list
+                                    if (StringPosition != -1)
+                                    {
+                                        strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                    }
+                                    else
+                                    {
+                                        CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                    }
+                                }
+                            }
                             break;
                         }
-                    //TO DO
                     case "S2TextConnect":
                         {
                             CompiledScript.Add(0x22);
+
+                            byte[] result = CompilerHelper.EncodeStringParameters
+                                    (instructions[CurrentInstruction].Arguments[0], 1);
+                            CompiledScript.AddRange(result);
+                            if (result[0] == 0x45)
+                            {
+                                //We check to see if the string is already in the list of strings
+                                int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                    instructions[CurrentInstruction].Arguments[0]);
+
+                                //If it is not, we add it to the list of strings and add the position of the string in the list
+                                if (StringPosition != -1)
+                                {
+                                    strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                    CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                }
+                                else
+                                {
+                                    CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                }
+                            }
+
+                            //We check to see if the string is already in the list of strings
+                            int StringPosition1 = CompilerHelper.GetPositionStringList(strings,
+                                instructions[CurrentInstruction].Arguments[1]);
+
+                            //If it is not, we add it to the list of strings and add the position of the string in the list
+                            if (StringPosition1 != -1)
+                            {
+                                strings.Add(instructions[CurrentInstruction].Arguments[1]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                            }
+                            else
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(StringPosition1));
+                            }
                             break;
                         }
                     case "FlagRand":
@@ -3737,10 +3854,13 @@ namespace FEW_Engine
                             CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(instructions[CurrentInstruction].Arguments[2])));
                             break;
                         }
-                    //TO DO
                     case "GetMiddlePos":
                         {
-                            CompiledScript.Add(0x4C); //or 0x39 or 0x3A or 0x3B or 0x3C or 3D
+                            CompiledScript.Add(0x4C);
+
+                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                            CompiledScript.AddRange(CompilerHelper.EncodeParameters
+                                    (instructions[CurrentInstruction].Arguments[1]));
                             break;
                         }
                     case "CgFullMidClear":
@@ -4336,10 +4456,37 @@ namespace FEW_Engine
                             }
                             break;
                         }
-                    //TO DO
                     case "TextOut":
                         {
                             CompiledScript.Add(0x8E);
+
+                            for (int CurrentArgument = 0; CurrentArgument < 4; CurrentArgument++)
+                            {
+                                CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[CurrentArgument])));
+                            }
+
+                            byte[] result = CompilerHelper.EncodeStringParameters
+                                    (instructions[CurrentInstruction].Arguments[4], 0);
+                            CompiledScript.AddRange(result);
+                            if (result[0] == 0x45)
+                            {
+
+                                //We check to see if the string is already in the list of strings
+                                int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                    instructions[CurrentInstruction].Arguments[4]);
+
+                                //If it is not, we add it to the list of strings and add the position of the string in the list
+                                if (StringPosition != -1)
+                                {
+                                    strings.Add(instructions[CurrentInstruction].Arguments[4]);
+                                    CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                }
+                                else
+                                {
+                                    CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                }
+                            }
                             break;
                         }
                     case "TextOutDefault":
@@ -4504,22 +4651,94 @@ namespace FEW_Engine
                             CompiledScript.Add(0x9C);
                             break;
                         }
-                    //TO DO
                     case "SaveGetDate":
                         {
                             CompiledScript.Add(0x9D);
+
+                            byte[] result = CompilerHelper.EncodeStringParameters
+                                    (instructions[CurrentInstruction].Arguments[0], 1);
+                            CompiledScript.AddRange(result);
+                            if (result[0] == 0x45)
+                            {
+
+                                //We check to see if the string is already in the list of strings
+                                int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                    instructions[CurrentInstruction].Arguments[0]);
+
+                                //If it is not, we add it to the list of strings and add the position of the string in the list
+                                if (StringPosition != -1)
+                                {
+                                    strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                    CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                }
+                                else
+                                {
+                                    CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                }
+                            }
+                            
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
-                    //TO DO
                     case "SaveGetTitle":
                         {
                             CompiledScript.Add(0x9E);
+
+                            byte[] result = CompilerHelper.EncodeStringParameters
+                                    (instructions[CurrentInstruction].Arguments[0], 1);
+                            CompiledScript.AddRange(result);
+                            if (result[0] == 0x45)
+                            {
+
+                                //We check to see if the string is already in the list of strings
+                                int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                    instructions[CurrentInstruction].Arguments[0]);
+
+                                //If it is not, we add it to the list of strings and add the position of the string in the list
+                                if (StringPosition != -1)
+                                {
+                                    strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                    CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                }
+                                else
+                                {
+                                    CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                }
+                            }
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
-                    //TO DO
                     case "SaveGetMemo":
                         {
                             CompiledScript.Add(0x9F);
+
+                            byte[] result = CompilerHelper.EncodeStringParameters
+                                    (instructions[CurrentInstruction].Arguments[0], 1);
+                            CompiledScript.AddRange(result);
+                            if (result[0] == 0x45)
+                            {
+
+                                //We check to see if the string is already in the list of strings
+                                int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                    instructions[CurrentInstruction].Arguments[0]);
+
+                                //If it is not, we add it to the list of strings and add the position of the string in the list
+                                if (StringPosition != -1)
+                                {
+                                    strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                    CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                }
+                                else
+                                {
+                                    CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                }
+                            }
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(
+                                    int.Parse(instructions[CurrentInstruction].Arguments[1])));
                             break;
                         }
                     case "ConfigGetEffect":
