@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -604,6 +605,7 @@ namespace FEW_Engine
 
                             instruction.Arguments.Add("=="); //or =
 
+                            //The third argument is the value to compare against
                             instruction.Arguments.Add(
                                 Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
@@ -925,8 +927,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add("=="); //or =
@@ -972,8 +983,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add("!=");
@@ -1019,8 +1039,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add("<");
@@ -1066,8 +1095,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add(">");
@@ -1113,8 +1151,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add("<=");
@@ -1160,8 +1207,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             instruction.Arguments.Add(">=");
@@ -1314,18 +1370,30 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             //We add the comparator
                             instruction.Arguments.Add("=="); //or =
+
+                            bool addedFlag = false;
 
                             //Now we do the second flag
                             switch (Data[currentOffset])
                             {
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
+                                    addedFlag = true;
                                     break;
                                 case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
@@ -1336,8 +1404,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (!addedFlag)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[2] = instruction.Arguments[2] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
@@ -1372,18 +1449,30 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             //We add the comparator
                             instruction.Arguments.Add("!=");
+
+                            bool addedFlag = false;
 
                             //Now we do the second flag
                             switch (Data[currentOffset])
                             {
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
+                                    addedFlag = true;
                                     break;
                                 case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
@@ -1394,8 +1483,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (!addedFlag)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[2] = instruction.Arguments[2] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
@@ -1430,18 +1528,30 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             //We add the comparator
                             instruction.Arguments.Add("<");
+
+                            bool addedFlag = false;
 
                             //Now we do the second flag
                             switch (Data[currentOffset])
                             {
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
+                                    addedFlag = true;
                                     break;
                                 case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
@@ -1452,8 +1562,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (!addedFlag)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[2] = instruction.Arguments[2] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
@@ -1488,18 +1607,30 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             //We add the comparator
                             instruction.Arguments.Add(">");
+
+                            bool addedFlag = false;
 
                             //Now we do the second flag
                             switch (Data[currentOffset])
                             {
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
+                                    addedFlag = true;
                                     break;
                                 case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
@@ -1510,8 +1641,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (!addedFlag)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[2] = instruction.Arguments[2] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
@@ -1546,18 +1686,30 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             //We add the comparator
                             instruction.Arguments.Add("<=");
+
+                            bool addedFlag = false;
 
                             //Now we do the second flag
                             switch (Data[currentOffset])
                             {
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
+                                    addedFlag = true;
                                     break;
                                 case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
@@ -1568,8 +1720,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (!addedFlag)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[2] = instruction.Arguments[2] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
@@ -1604,18 +1765,30 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (instruction.Arguments.Count == 0)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[0] = instruction.Arguments[0] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             //We add the comparator
                             instruction.Arguments.Add(">=");
+
+                            bool addedFlag = false;
 
                             //Now we do the second flag
                             switch (Data[currentOffset])
                             {
                                 case 0x3F:
                                     instruction.Arguments.Add("g");
+                                    addedFlag = true;
                                     break;
                                 case 0x3E:
                                     //Check to see if the code is done correctly, because when the flag is not supposed
@@ -1626,8 +1799,17 @@ namespace FEW_Engine
                             }
                             currentOffset++;
 
-                            instruction.Arguments.Add(
-                                Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            //The first argument is the flag, and we have to ensure that it is not a special flag (as checked before)
+                            if (!addedFlag)
+                            {
+                                instruction.Arguments.Add(
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset)));
+                            }
+                            else
+                            {
+                                instruction.Arguments[2] = instruction.Arguments[2] +
+                                    Convert.ToString(BitConverter.ToInt16(Data, currentOffset));
+                            }
                             currentOffset += 2;
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
@@ -3108,16 +3290,190 @@ namespace FEW_Engine
                             }
                             break;
                         }
-                    //TO DO
                     case "FlagCheck":
                         {
-                            CompiledScript.Add(0x25); //0x26 or 0x27 or 0x28 or 0x29 or 0x2A
+                            //First we add the operand by looking at the second argument
+                            switch (instructions[CurrentInstruction].Arguments[1])
+                            {
+                                case "==":
+                                    {
+                                        CompiledScript.Add(0x25);
+                                        break;
+                                    }
+                                case "!=":
+                                    {
+                                        CompiledScript.Add(0x26);
+                                        break;
+                                    }
+                                case "<":
+                                    {
+                                        CompiledScript.Add(0x27);
+                                        break;
+                                    }
+                                case ">":
+                                    {
+                                        CompiledScript.Add(0x28);
+                                        break;
+                                    }
+                                case "<=":
+                                    {
+                                        CompiledScript.Add(0x29);
+                                        break;
+                                    }
+                                case ">=":
+                                    {
+                                        CompiledScript.Add(0x2A);
+                                        break;
+                                    }
+                            }
+
+                            //Now we add the type of flag by reading the first character of the first argument, and then we add the numbers
+                            //that follow it, or the number itself if it is not a flag
+                            switch (instructions[CurrentInstruction].Arguments[0][0])
+                            {
+                                case 'g':
+                                    {
+                                        CompiledScript.Add(0x3F);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0].Substring(1))));
+                                        break;
+                                    }
+                                case 'f':
+                                    {
+                                        CompiledScript.Add(0x3E);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0].Substring(1))));
+                                        break;
+                                    }
+                                case 'c':
+                                    {
+                                        CompiledScript.Add(0x42);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0].Substring(1))));
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        CompiledScript.Add(0x43);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0])));
+                                        break;
+                                    }
+                            }
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                instructions[CurrentInstruction].Arguments[2])));
+
+                            bool hasAddress = CompilerHelper.ExistsLabel(labels, instructions[CurrentInstruction].Arguments[3]);
+
+                            if (hasAddress)
+                            {
+                                var existingLabel = CompilerHelper.GetLabel(labels, instructions[CurrentInstruction].Arguments[3]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(existingLabel.Address));
+                            }
+                            else if (!hasAddress)
+                            {
+                                var newLabel = new Label
+                                {
+                                    Name = instructions[CurrentInstruction].Arguments[3],
+                                    Address = CompiledScript.Count
+                                };
+                                pendingLabels.Add(newLabel);
+                                CompiledScript.AddRange(new byte[4]); //Placeholder of 4 bytes
+                            }
                             break;
                         }
-                    //TO DO
                     case "FlagCheckGosub":
                         {
-                            CompiledScript.Add(0x2B); //0x2C or 0x2D or 0x2E or 0x2F or 0x30
+                            //First we add the operand by looking at the second argument
+                            switch (instructions[CurrentInstruction].Arguments[1])
+                            {
+                                case "==":
+                                    {
+                                        CompiledScript.Add(0x2B);
+                                        break;
+                                    }
+                                case "!=":
+                                    {
+                                        CompiledScript.Add(0x2C);
+                                        break;
+                                    }
+                                case "<":
+                                    {
+                                        CompiledScript.Add(0x2D);
+                                        break;
+                                    }
+                                case ">":
+                                    {
+                                        CompiledScript.Add(0x2E);
+                                        break;
+                                    }
+                                case "<=":
+                                    {
+                                        CompiledScript.Add(0x2F);
+                                        break;
+                                    }
+                                case ">=":
+                                    {
+                                        CompiledScript.Add(0x30);
+                                        break;
+                                    }
+                            }
+
+                            //Now we add the type of flag by reading the first character of the first argument, and then we add the numbers
+                            //that follow it, or the number itself if it is not a flag
+                            switch (instructions[CurrentInstruction].Arguments[0][0])
+                            {
+                                case 'g':
+                                    {
+                                        CompiledScript.Add(0x3F);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0].Substring(1))));
+                                        break;
+                                    }
+                                case 'f':
+                                    {
+                                        CompiledScript.Add(0x3E);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0].Substring(1))));
+                                        break;
+                                    }
+                                case 'c':
+                                    {
+                                        CompiledScript.Add(0x42);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0].Substring(1))));
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        CompiledScript.Add(0x43);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0])));
+                                        break;
+                                    }
+                            }
+
+                            CompiledScript.AddRange(BitConverter.GetBytes(int.Parse(
+                                instructions[CurrentInstruction].Arguments[2])));
+
+                            bool hasAddress = CompilerHelper.ExistsLabel(labels, instructions[CurrentInstruction].Arguments[3]);
+
+                            if (hasAddress)
+                            {
+                                var existingLabel = CompilerHelper.GetLabel(labels, instructions[CurrentInstruction].Arguments[3]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(existingLabel.Address));
+                            }
+                            else if (!hasAddress)
+                            {
+                                var newLabel = new Label
+                                {
+                                    Name = instructions[CurrentInstruction].Arguments[3],
+                                    Address = CompiledScript.Count
+                                };
+                                pendingLabels.Add(newLabel);
+                                CompiledScript.AddRange(new byte[4]); //Placeholder of 4 bytes
+                            }
                             break;
                         }
                     case "F2FAdd":
@@ -3198,10 +3554,100 @@ namespace FEW_Engine
                                     (instructions[CurrentInstruction].Arguments[2]));
                             break;
                         }
-                    //TO DO
                     case "F2FCheck":
                         {
-                            CompiledScript.Add(0x38); //or 0x39 or 0x3A or 0x3B or 0x3C or 3D
+                            //First we add the operand by looking at the second argument
+                            switch (instructions[CurrentInstruction].Arguments[1])
+                            {
+                                case "==":
+                                    {
+                                        CompiledScript.Add(0x38);
+                                        break;
+                                    }
+                                case "!=":
+                                    {
+                                        CompiledScript.Add(0x39);
+                                        break;
+                                    }
+                                case "<":
+                                    {
+                                        CompiledScript.Add(0x3A);
+                                        break;
+                                    }
+                                case ">":
+                                    {
+                                        CompiledScript.Add(0x3B);
+                                        break;
+                                    }
+                                case "<=":
+                                    {
+                                        CompiledScript.Add(0x3C);
+                                        break;
+                                    }
+                                case ">=":
+                                    {
+                                        CompiledScript.Add(0x3D);
+                                        break;
+                                    }
+                            }
+
+                            //Now we add the type of flag by reading the first character of the first argument, and then we add the numbers
+                            //that follow it, or the number itself if it is not a flag
+                            switch (instructions[CurrentInstruction].Arguments[0][0])
+                            {
+                                case 'g':
+                                    {
+                                        CompiledScript.Add(0x3F);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0].Substring(1))));
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        CompiledScript.Add(0x3E);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[0])));
+                                        break;
+                                    }
+                            }
+
+                            //Now we add the type of flag by reading the first character of the first argument, and then we add the numbers
+                            //that follow it, or the number itself if it is not a flag
+                            switch (instructions[CurrentInstruction].Arguments[2][0])
+                            {
+                                case 'g':
+                                    {
+                                        CompiledScript.Add(0x3F);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[2].Substring(1))));
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        CompiledScript.Add(0x3E);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(short.Parse(
+                                            instructions[CurrentInstruction].Arguments[2])));
+                                        break;
+                                    }
+                            }
+
+                            bool hasAddress = CompilerHelper.ExistsLabel(labels, instructions[CurrentInstruction].Arguments[3]);
+
+                            if (hasAddress)
+                            {
+                                var existingLabel = CompilerHelper.GetLabel(labels, instructions[CurrentInstruction].Arguments[3]);
+                                CompiledScript.AddRange(BitConverter.GetBytes(existingLabel.Address));
+                            }
+                            else if (!hasAddress)
+                            {
+                                var newLabel = new Label
+                                {
+                                    Name = instructions[CurrentInstruction].Arguments[3],
+                                    Address = CompiledScript.Count
+                                };
+                                pendingLabels.Add(newLabel);
+                                CompiledScript.AddRange(new byte[4]); //Placeholder of 4 bytes
+                            }
                             break;
                         }
                     case "CgFull":
