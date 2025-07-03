@@ -5041,13 +5041,29 @@ namespace FEW_Engine
                             CurrentDialogueInstruction++;
                             break;
                         }
+                    case "Label":
+                        var newLabel1 = new Label
+                        {
+                            Name = instructions[CurrentInstruction].Arguments[0],
+                            Address = CompiledScript.Count
+                        };
+                        labels.Add(newLabel1);
+                        break;
+                    default:
+                        break;
                 }
             }
 
             //Now we can go through the label list and replace the placeholders with the actual offsets
             foreach (var pendingLabel in pendingLabels)
             {
-                var actualLabel = labels.First(l => l.Name == pendingLabel.Name);
+                var actualLabel = labels.FirstOrDefault(l => l.Name == pendingLabel.Name);
+                if (actualLabel == null)
+                {
+                    // Debug output or throw a more informative error
+                    Console.WriteLine($"Label '{pendingLabel.Name}' not found in labels list!");
+                    throw new Exception($"Label '{pendingLabel.Name}' not found in labels list!");
+                }
                 int address = actualLabel.Address;
                 CompiledScript[pendingLabel.Address] = (byte)(address & 0xFF);
                 CompiledScript[pendingLabel.Address + 1] = (byte)((address >> 8) & 0xFF);
@@ -5063,6 +5079,29 @@ namespace FEW_Engine
             CompiledScript[1] = (byte)((CompiledScript.Count >> 8) & 0xFF);
             CompiledScript[2] = (byte)((CompiledScript.Count >> 16) & 0xFF);
             CompiledScript[3] = (byte)((CompiledScript.Count >> 24) & 0xFF);
+
+            //After this, comes the label list section. In our analyzed game, it has some data, but it doesn't seem to be used
+            //at any point in time, so we will not include it here, just the padding byte after it
+            CompiledScript.Add(0);
+
+            //Now we can add the offset to where the string list is located
+            CompiledScript[4] = (byte)(CompiledScript.Count & 0xFF);
+            CompiledScript[5] = (byte)((CompiledScript.Count >> 8) & 0xFF);
+            CompiledScript[6] = (byte)((CompiledScript.Count >> 16) & 0xFF);
+            CompiledScript[7] = (byte)((CompiledScript.Count >> 24) & 0xFF);
+
+            //Strings section. Here is where we add the strings that were used in the bytecode section
+            foreach (var CurrentLine in strings)
+            {
+                //Then we add the string itself, encoded in Shift-JIS
+                CompiledScript.AddRange(shiftJIS.GetBytes(CurrentLine));
+
+                //And we add a null byte to the end of the string
+                CompiledScript.Add(0x00);
+            }
+
+            //After compiling all of the strings, we add a 1 byte to indicate the end of the strings section
+            CompiledScript.Add(0);
 
             return CompiledScript.ToArray();
         }
