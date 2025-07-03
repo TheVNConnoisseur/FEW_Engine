@@ -106,11 +106,7 @@ public partial class MainWindow : Window
                         }
                         else if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_define"))
                         {
-                            byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
-                            Dat dat = new Dat();
-                            byte[] DecryptedFile = dat.Decrypt(Data);
-                            File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".dat", DecryptedFile);
-                            //File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".txt", dat.Parse(DecryptedFile), shiftJIS);
+                            throw new NotImplementedException("The conversion from definition files to JSON is not implemented for this version of the tool.");
                         }
                     }
                     else if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".json")
