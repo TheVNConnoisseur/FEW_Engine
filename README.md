@@ -4,6 +4,7 @@ Tool that allows the modification of script files offered in ANIM and CROWD powe
 ### Notes on its usage
 1. The tool has only been tested (and will NOT be tested with other games) with [Zetsuboushi](https://vndb.org/v3315). So, considering that this tool does a full recompilation of the script file, incompatibilities across the entire library of CROWD and ANIM games.
 2. The program will not decrypt the *_define.dat file, mostly because it has yet to be investigated, although the format seems to be pretty simple.
+3. This iteration of the program is still in beta, and not finished.
 
 ### How are *_sce.dat files created?
 While the code also documents how these files are structured, here it is also the same information on a more accessible manner.
