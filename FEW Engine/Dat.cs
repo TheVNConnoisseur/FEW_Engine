@@ -3010,7 +3010,7 @@ namespace FEW_Engine
                         }
                     default:
                         {
-                            break;
+                            throw new Exception("The current opcode is not supported, probably because the game is unsupported.");
                         }
                 }
 
@@ -5071,7 +5071,7 @@ namespace FEW_Engine
                         labels.Add(newLabel1);
                         break;
                     default:
-                        break;
+                            throw new Exception("The current opcode is not supported, probably because the game is unsupported.");
                 }
             }
 

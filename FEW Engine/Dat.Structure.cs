@@ -16,6 +16,8 @@ namespace FEW_Engine
         public int Address { get; set; } //The address of the label, which is the offset from the start of the script
     }
 
+    //While the game doesn't necessarily has to abide by this format, generally speaking, all instructions follow the same pattern:
+    //a type that defines what said instruction should do, and its arguments which will determine how said instruction should act.
     public class Instruction
     {
         public string Type { get; set; }
