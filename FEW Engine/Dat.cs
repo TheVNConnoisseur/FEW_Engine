@@ -3048,6 +3048,7 @@ namespace FEW_Engine
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Encoding shiftJIS = Encoding.GetEncoding("shift-jis");
 
+            //Bytecode section
             for (int CurrentInstruction = 0; CurrentInstruction < instructions.Count; CurrentInstruction++)
             {
                 switch (instructions[CurrentInstruction].Type)
@@ -3135,7 +3136,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[5]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[5]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3163,7 +3164,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3254,7 +3255,7 @@ namespace FEW_Engine
                                     instructions[CurrentInstruction].Arguments[0]);
 
                                 //If it is not, we add it to the list of strings and add the position of the string in the list
-                                if (StringPosition != -1)
+                                if (StringPosition == -1)
                                 {
                                     strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                     CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3270,7 +3271,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[1]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition1 != -1)
+                            if (StringPosition1 == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[1]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3297,7 +3298,7 @@ namespace FEW_Engine
                                         instructions[CurrentInstruction].Arguments[CurrentArgument]);
 
                                     //If it is not, we add it to the list of strings and add the position of the string in the list
-                                    if (StringPosition != -1)
+                                    if (StringPosition == -1)
                                     {
                                         strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
                                         CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3326,7 +3327,7 @@ namespace FEW_Engine
                                         instructions[CurrentInstruction].Arguments[CurrentArgument]);
 
                                     //If it is not, we add it to the list of strings and add the position of the string in the list
-                                    if (StringPosition != -1)
+                                    if (StringPosition == -1)
                                     {
                                         strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
                                         CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3353,7 +3354,7 @@ namespace FEW_Engine
                                     instructions[CurrentInstruction].Arguments[0]);
 
                                 //If it is not, we add it to the list of strings and add the position of the string in the list
-                                if (StringPosition != -1)
+                                if (StringPosition == -1)
                                 {
                                     strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                     CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3369,7 +3370,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[1]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition1 != -1)
+                            if (StringPosition1 == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[1]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3403,7 +3404,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3783,7 +3784,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3811,7 +3812,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[2]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[2]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3833,7 +3834,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[1]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[1]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3881,7 +3882,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3906,12 +3907,95 @@ namespace FEW_Engine
                             CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
                             break;
                         }
-                    //TO DO (0x4E is done correctly, but EFFECT uses more opcodes)
                     case "Effect":
                         {
-                            CompiledScript.Add(0x4E);
+                            switch (instructions[CurrentInstruction].Arguments[0][0])
+                            {
+                                case 'Z':
+                                    CompiledScript.Add(0x4F);
 
-                            CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
+                                    CompiledScript.AddRange(new byte[] { 0, 0, 0, 220, 220, 220, 200 });
+                                    CompiledScript.Add(0x4E);
+                                    CompiledScript.Add(23);
+                                    break;
+                                case '[':
+                                    CompiledScript.Add(0x51);
+
+                                    CompiledScript.AddRange(BitConverter.GetBytes((short)0));
+                                    CompiledScript.AddRange(BitConverter.GetBytes((short)30));
+                                    CompiledScript.AddRange(BitConverter.GetBytes((short)80));
+                                    CompiledScript.AddRange(BitConverter.GetBytes((short)400));
+                                    break;
+                                case '\\':
+                                    CompiledScript.Add(0x51);
+
+                                    CompiledScript.AddRange(BitConverter.GetBytes((short)30));
+                                    CompiledScript.AddRange(BitConverter.GetBytes((short)0));
+                                    CompiledScript.AddRange(BitConverter.GetBytes((short)80));
+                                    CompiledScript.AddRange(BitConverter.GetBytes((short)400));
+                                    break;
+                                case ']':
+                                    CompiledScript.Add(0x4F);
+
+                                    CompiledScript.AddRange(new byte[] { 0, 0, 0, 220, 220, 220, 10 });
+                                    CompiledScript.Add(0x4E);
+                                    CompiledScript.Add(21);
+                                    break;
+                                case '^':
+                                    CompiledScript.Add(0x52);
+
+                                    //We check to see if the string is already in the list of strings
+                                    int StringPosition = CompilerHelper.GetPositionStringList(strings,
+                                        "pef_clo");
+
+                                    //If it is not, we add it to the list of strings and add the position of the string in the list
+                                    if (StringPosition == -1)
+                                    {
+                                        strings.Add("pef_clo");
+                                        CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                    }
+                                    else
+                                    {
+                                        CompiledScript.AddRange(BitConverter.GetBytes(StringPosition));
+                                    }
+                                    break;
+                                case '_':
+                                    CompiledScript.Add(0x52);
+
+                                    //We check to see if the string is already in the list of strings
+                                    int StringPosition1 = CompilerHelper.GetPositionStringList(strings,
+                                        "pef_cir");
+
+                                    //If it is not, we add it to the list of strings and add the position of the string in the list
+                                    if (StringPosition1 == -1)
+                                    {
+                                        strings.Add("pef_cir");
+                                        CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                    }
+                                    else
+                                    {
+                                        CompiledScript.AddRange(BitConverter.GetBytes(StringPosition1));
+                                    }
+                                    break;
+                                default:
+                                    CompiledScript.Add(0x4E);
+
+                                    //We check to see if the string is already in the list of strings
+                                    int StringPosition2 = CompilerHelper.GetPositionStringList(strings,
+                                        instructions[CurrentInstruction].Arguments[0]);
+
+                                    //If it is not, we add it to the list of strings and add the position of the string in the list
+                                    if (StringPosition2 == -1)
+                                    {
+                                        strings.Add(instructions[CurrentInstruction].Arguments[0]);
+                                        CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
+                                    }
+                                    else
+                                    {
+                                        CompiledScript.AddRange(BitConverter.GetBytes(StringPosition2));
+                                    }
+                                    break;
+                            }
                             break;
                         }
                     case "CModeFlash":
@@ -3952,7 +4036,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -3975,7 +4059,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[1]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[1]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4086,7 +4170,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4125,7 +4209,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4145,7 +4229,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4172,7 +4256,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[1]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[1]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4204,7 +4288,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4224,7 +4308,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4289,7 +4373,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4309,7 +4393,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4340,7 +4424,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[5]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[5]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4366,7 +4450,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[5]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[5]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4500,7 +4584,7 @@ namespace FEW_Engine
                                     instructions[CurrentInstruction].Arguments[4]);
 
                                 //If it is not, we add it to the list of strings and add the position of the string in the list
-                                if (StringPosition != -1)
+                                if (StringPosition == -1)
                                 {
                                     strings.Add(instructions[CurrentInstruction].Arguments[4]);
                                     CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4521,7 +4605,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[0]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4577,7 +4661,7 @@ namespace FEW_Engine
                                 instructions[CurrentInstruction].Arguments[1]);
 
                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                            if (StringPosition != -1)
+                            if (StringPosition == -1)
                             {
                                 strings.Add(instructions[CurrentInstruction].Arguments[1]);
                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4689,7 +4773,7 @@ namespace FEW_Engine
                                     instructions[CurrentInstruction].Arguments[0]);
 
                                 //If it is not, we add it to the list of strings and add the position of the string in the list
-                                if (StringPosition != -1)
+                                if (StringPosition == -1)
                                 {
                                     strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                     CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4719,7 +4803,7 @@ namespace FEW_Engine
                                     instructions[CurrentInstruction].Arguments[0]);
 
                                 //If it is not, we add it to the list of strings and add the position of the string in the list
-                                if (StringPosition != -1)
+                                if (StringPosition == -1)
                                 {
                                     strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                     CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4749,7 +4833,7 @@ namespace FEW_Engine
                                     instructions[CurrentInstruction].Arguments[0]);
 
                                 //If it is not, we add it to the list of strings and add the position of the string in the list
-                                if (StringPosition != -1)
+                                if (StringPosition == -1)
                                 {
                                     strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                     CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4821,7 +4905,7 @@ namespace FEW_Engine
                                 int StringPosition = CompilerHelper.GetPositionStringList(strings,
                                     instructions[CurrentInstruction].Arguments[CurrentArgument]);
                                 //If it is not, we add it to the list of strings and add the position of the string in the list
-                                if (StringPosition != -1)
+                                if (StringPosition == -1)
                                 {
                                     strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
                                     CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4865,7 +4949,7 @@ namespace FEW_Engine
                                             instructions[CurrentInstruction].Arguments[0]);
 
                                         //If it is not, we add it to the list of strings and add the position of the string in the list
-                                        if (StringPosition != -1)
+                                        if (StringPosition == -1)
                                         {
                                             strings.Add(instructions[CurrentInstruction].Arguments[0]);
                                             CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4887,7 +4971,7 @@ namespace FEW_Engine
                                                 instructions[CurrentInstruction].Arguments[CurrentArgument]);
 
                                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                                            if (StringPosition != -1)
+                                            if (StringPosition == -1)
                                             {
                                                 strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
                                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4913,7 +4997,7 @@ namespace FEW_Engine
                                                 instructions[CurrentInstruction].Arguments[CurrentArgument]);
 
                                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                                            if (StringPosition != -1)
+                                            if (StringPosition == -1)
                                             {
                                                 strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
                                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4939,7 +5023,7 @@ namespace FEW_Engine
                                                 instructions[CurrentInstruction].Arguments[CurrentArgument]);
 
                                             //If it is not, we add it to the list of strings and add the position of the string in the list
-                                            if (StringPosition != -1)
+                                            if (StringPosition == -1)
                                             {
                                                 strings.Add(instructions[CurrentInstruction].Arguments[CurrentArgument]);
                                                 CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
@@ -4959,6 +5043,26 @@ namespace FEW_Engine
                         }
                 }
             }
+
+            //Now we can go through the label list and replace the placeholders with the actual offsets
+            foreach (var pendingLabel in pendingLabels)
+            {
+                var actualLabel = labels.First(l => l.Name == pendingLabel.Name);
+                int address = actualLabel.Address;
+                CompiledScript[pendingLabel.Address] = (byte)(address & 0xFF);
+                CompiledScript[pendingLabel.Address + 1] = (byte)((address >> 8) & 0xFF);
+                CompiledScript[pendingLabel.Address + 2] = (byte)((address >> 16) & 0xFF);
+                CompiledScript[pendingLabel.Address + 3] = (byte)((address >> 24) & 0xFF);
+            }
+
+            //After compiling all of the instructions, we add a 1 byte to indicate the end of the bytecode section
+            CompiledScript.Add(1);
+
+            //Now we can add the offset to where the label list is located
+            CompiledScript[0] = (byte)(CompiledScript.Count & 0xFF);
+            CompiledScript[1] = (byte)((CompiledScript.Count >> 8) & 0xFF);
+            CompiledScript[2] = (byte)((CompiledScript.Count >> 16) & 0xFF);
+            CompiledScript[3] = (byte)((CompiledScript.Count >> 24) & 0xFF);
 
             return CompiledScript.ToArray();
         }
