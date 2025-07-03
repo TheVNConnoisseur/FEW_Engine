@@ -15,4 +15,15 @@ namespace FEW_Engine
                                          //readable (not kept in the compiled script)
         public int Address { get; set; } //The address of the label, which is the offset from the start of the script
     }
+
+    public class Instruction
+    {
+        public string Type { get; set; }
+        public List<string> Arguments { get; set; }
+
+        public Instruction()
+        {
+            Arguments = new List<string>();
+        }
+    }
 }

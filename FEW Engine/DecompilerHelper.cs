@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace FEW_Engine
 {
-    internal static class DecrypterHelper
+    internal static class DecompilerHelper
     {
 
         //Function that obtains the parameter given a data array
@@ -99,9 +99,12 @@ namespace FEW_Engine
             // Try to find existing label
             var existingLabel = labels.FirstOrDefault(l => l.Address == address);
 
-            if (existingLabel.Address != 0 || labels.Any(l => l.Address == 0)) //Covers address 0 edge case
+            if (existingLabel != null)
             {
-                return existingLabel;
+                if (existingLabel.Address != 0 || labels.Any(l => l.Address == 0)) //Covers address 0 edge case
+                {
+                    return existingLabel;
+                }
             }
 
             //Create and add new label
