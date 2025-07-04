@@ -251,7 +251,7 @@ namespace FEW_Engine
                         }
                     case 0xD:
                         {
-                            instruction.Type = "MacroEnd"; //or Return
+                            instruction.Type = "Return"; //or MacroEnd
                             currentOffset++;
                             break;
                         }
@@ -3139,7 +3139,7 @@ namespace FEW_Engine
                             }
                             break;
                         }
-                    case "MacroEnd":
+                    case "Return":
                         {
                             CompiledScript.Add(0xD);
                             break;
