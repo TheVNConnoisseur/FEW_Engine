@@ -186,7 +186,8 @@ namespace FEW_Engine
             while (currentOffset < offsetLabels - 1)
             {
                 Instruction instruction = new Instruction();
-                
+                InstructionOffset.Add(currentOffset);
+
                 switch (Data[currentOffset])
                 {
                     case 0x2:
@@ -3016,8 +3017,6 @@ namespace FEW_Engine
                 }
 
                 instructions.Add(instruction);
-
-                InstructionOffset.Add(currentOffset);
             }
 
             //After finishing the entire instruction array, what we need to do now is insert into it the Label instructions
@@ -5070,8 +5069,6 @@ namespace FEW_Engine
                 var actualLabel = labels.FirstOrDefault(l => l.Name == pendingLabel.Name);
                 if (actualLabel == null)
                 {
-                    // Debug output or throw a more informative error
-                    Console.WriteLine($"Label '{pendingLabel.Name}' not found in labels list!");
                     throw new Exception($"Label '{pendingLabel.Name}' not found in labels list!");
                 }
                 int address = actualLabel.Address;

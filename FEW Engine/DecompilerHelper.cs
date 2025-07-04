@@ -107,13 +107,12 @@ namespace FEW_Engine
                 }
             }
 
-            //Create and add new label
+            //Create new label
             var newLabel = new Label
             {
                 Name = "Label_" + labels.Count(),
                 Address = address
             };
-            labels.Add(newLabel);
             return newLabel;
         }
     }
