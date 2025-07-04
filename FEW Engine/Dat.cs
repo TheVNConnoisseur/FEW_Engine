@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -3061,6 +3062,7 @@ namespace FEW_Engine
             instructions = JsonSerializer.Deserialize<List<Instruction>>(JSON, options) ?? new List<Instruction>();
 
             List<byte> CompiledScript = new List<byte>();
+            CompiledScript.AddRange(new byte[12]); //Placeholder for the offsets, will be filled later
 
             //The instructions that are dialogue related do keep track of their number, and it starts from number 0, incrementing by 1
             //each time a new instruction of dialogue is added.
@@ -3895,7 +3897,7 @@ namespace FEW_Engine
                     case "CgFullMidClear":
                         {
                             CompiledScript.Add(0x4D);
-                            CompiledScript.AddRange(new byte[] { 0x00, 0x4D, 0x01, 0x4D, 0x02, 0x4D, 0x03, 0x4D, 0x05,
+                            CompiledScript.AddRange(new byte[] { 0x00, 0x4D, 0x01, 0x4D, 0x02, 0x4D, 0x03, 0x4D, 0x04, 0x4D, 0x05,
                                 0x4D, 0x06, 0x4D, 0x07, 0x4D, 0x08, 0x4D, 0x09, 0x46 });
 
                             //We check to see if the string is already in the list of strings
@@ -3917,7 +3919,7 @@ namespace FEW_Engine
                     case "CgMidClearAll":
                         {
                             CompiledScript.Add(0x4D);
-                            CompiledScript.AddRange(new byte[] { 0x00, 0x4D, 0x01, 0x4D, 0x02, 0x4D, 0x03, 0x4D, 0x05,
+                            CompiledScript.AddRange(new byte[] { 0x00, 0x4D, 0x01, 0x4D, 0x02, 0x4D, 0x03, 0x4D, 0x04, 0x4D, 0x05,
                                 0x4D, 0x06, 0x4D, 0x07, 0x4D, 0x08, 0x4D, 0x09 });
                             break;
                         }
@@ -4001,20 +4003,7 @@ namespace FEW_Engine
                                 default:
                                     CompiledScript.Add(0x4E);
 
-                                    //We check to see if the string is already in the list of strings
-                                    int StringPosition2 = CompilerHelper.GetPositionStringList(strings,
-                                        instructions[CurrentInstruction].Arguments[0]);
-
-                                    //If it is not, we add it to the list of strings and add the position of the string in the list
-                                    if (StringPosition2 == -1)
-                                    {
-                                        strings.Add(instructions[CurrentInstruction].Arguments[0]);
-                                        CompiledScript.AddRange(BitConverter.GetBytes(strings.Count - 1));
-                                    }
-                                    else
-                                    {
-                                        CompiledScript.AddRange(BitConverter.GetBytes(StringPosition2));
-                                    }
+                                    CompiledScript.Add(byte.Parse(instructions[CurrentInstruction].Arguments[0]));
                                     break;
                             }
                             break;
