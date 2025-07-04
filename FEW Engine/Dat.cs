@@ -225,10 +225,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -241,10 +237,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -603,10 +595,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -659,10 +647,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -715,10 +699,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -771,10 +751,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -827,10 +803,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -883,10 +855,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -939,10 +907,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -995,10 +959,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1051,10 +1011,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1107,10 +1063,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1163,10 +1115,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1219,10 +1167,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1410,10 +1354,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1489,10 +1429,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1568,10 +1504,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1647,10 +1579,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1726,10 +1654,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -1805,10 +1729,6 @@ namespace FEW_Engine
 
                             int labelIndex = BitConverter.ToInt32(Data, currentOffset);
                             Label label = DecompilerHelper.CreateLabel(pendingLabels, labelIndex);
-                            if (label.Name == "Label_" + pendingLabels.Count()) //If the label is new, we add it to the list of labels
-                            {
-                                pendingLabels.Add(label);
-                            }
                             instruction.Arguments.Add(label.Name);
                             currentOffset += 4;
 
@@ -3018,6 +2938,10 @@ namespace FEW_Engine
 
                 instructions.Add(instruction);
             }
+
+            //We reorder the list of labels in descending order based on the addresses, since that way we can insert the
+            //labels in their corresponding spots without messing around the rest of the labels
+            pendingLabels.Sort((a, b) => b.Address.CompareTo(a.Address));
 
             //After finishing the entire instruction array, what we need to do now is insert into it the Label instructions
             for (int CurrentPendingLabel = 0; CurrentPendingLabel < pendingLabels.Count; CurrentPendingLabel++)

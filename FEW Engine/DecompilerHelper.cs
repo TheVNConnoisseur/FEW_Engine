@@ -101,18 +101,17 @@ namespace FEW_Engine
 
             if (existingLabel != null)
             {
-                if (existingLabel.Address != 0 || labels.Any(l => l.Address == 0)) //Covers address 0 edge case
-                {
-                    return existingLabel;
-                }
+                return existingLabel;
             }
 
-            //Create new label
+            //Create new label and add it to the list
             var newLabel = new Label
             {
                 Name = "Label_" + labels.Count(),
                 Address = address
             };
+            labels.Add(newLabel);
+
             return newLabel;
         }
     }
