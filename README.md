@@ -26,7 +26,7 @@ So, all in all, a script file is divided into 3 parts:
   * **Bytecode section**: it includes each instruction of the script file.
   * **Label section**: its actual functionality is unknown, but in the analyzed game is non-existent.
   * **String section**: a list of all of the strings used in the game that are user-defined.
-  * **Jump label section**: probably a list similar to the jump label section.
+  * **Jump label section**: probably a list similar to the label section.
 
     
 ### Can you confirm to me that your decompilation process works flawlessly?
