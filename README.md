@@ -35,7 +35,13 @@ Honestly, no. The process of compilation destroys a lot of information, like for
 ### Hey! This program does not seem to work with my game? What gives?
 Quite a lot of progress has been made on understanding the game format. Since this project is mostly focused on the game mentioned earlier and just in case something may vary between games, the following files have been included in order help users understanding the engine's inner workings:
 - **Decompilation**: the engine opcodes are defined in the game executable. In this case, a .i64 file generated with IDA Pro 9.1 with a lot of the game's functions understood, and for the opcodes the function to look for has been called **CompileScript**. The cracked game executable has been included (a full retail copy is still needed to debug the game, but no to open the pseudocode decompilation) since the original executable is packed with a program called *SETTEC*, so using the cracked executable makes the job easier. This was done mostly by [Crsky](https://github.com/crskycode/).
-- **Script**: the game's zet_sce.dat is the decrypted version of the original file and the zte_sce.txt is the list of variables of the script.
+- **Script**: the game's zet_sce.dat is the decrypted version of the original file.
+
+Something worthy mentioning regarding the analyzed game, the game offers two things that can help a tiny bit when debugging and understanding the game. If you launch the main program while adding as a parameter a specific number, you'll get the game running plus a debug window too:
+- **1:** you'll get a window that tracks all of the flags and the sound files loaded for each BGM and SE available track.
+- **2:** it closes the game immediately (I'm not even sure if you need a file called modebug.bin or something, I can't confirm that part).
+- **5:** it opens a window which said purpose is still unknown.
+- **6:** it combines the effects of parameters 1 and 5.
 
 Sadly, CROWD and ANIM have made a lot of changes in the engine (either in the past and in the future if we take our analyzed game as a point of reference), so there's no other option that to decompile your game's main executable of choice and try to find what instructions it is expecting and how each of them are structured.
 Thankfully, most of the structure seems to be mostly the same, so a lot of the work done here can be taken forward to make more games compatible with this tool.
