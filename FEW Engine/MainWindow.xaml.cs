@@ -107,7 +107,9 @@ public partial class MainWindow : Window
                         }
                         else if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_define"))
                         {
-                            File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + "_decrypted.dat", DecryptedFile);
+                            var options = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
+                            string json = JsonSerializer.Serialize(Define.Parse(DecryptedFile), options);
+                            File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".json", json, shiftJIS);
                         }
                     }
                     else if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".json")

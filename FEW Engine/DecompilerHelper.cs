@@ -114,5 +114,24 @@ namespace FEW_Engine
 
             return newLabel;
         }
+
+        //When parsing a file, all strings generally speaking are structured in a pretty basic way: an array of bytes
+        //that are null terminated, indicating the end of the string. In this case, this function already updates the
+        //offset value for the actual byte arraye
+        public static string ReadNullTerminatedString(byte[] Data, ref int Offset, Encoding Encoding)
+        {
+            int Start = Offset;
+
+            //Find the null terminator
+            while (Offset < Data.Length && Data[Offset] != 0)
+            {
+                Offset++;
+            }
+
+            int Length = Offset - Start;
+            string Result = Encoding.GetString(Data, Start, Length);
+            Offset++; //Skip the null terminator
+            return Result;
+        }
     }
 }
