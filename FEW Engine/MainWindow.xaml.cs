@@ -95,30 +95,29 @@ public partial class MainWindow : Window
                     //Check what name and extension the file has, in order to choose its corresponding class
                     if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".dat")
                     {
+                        //Read the DAT input file and decrypt it
+                        byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
+                        byte[] DecryptedFile = Dat.Decrypt(Data);
+
                         if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_sce"))
                         {
-                            byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
-                            Dat dat = new Dat();
-                            byte[] DecryptedFile = dat.Decrypt(Data);
                             var options = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.Create(UnicodeRanges.All) };
-                            string json = JsonSerializer.Serialize(dat.Parse(DecryptedFile), options);
+                            string json = JsonSerializer.Serialize(Sce.Parse(DecryptedFile), options);
                             File.WriteAllText(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".json", json, shiftJIS);
                         }
                         else if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_define"))
                         {
-                            byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
-                            Dat dat = new Dat();
-                            byte[] DecryptedFile = dat.Decrypt(Data);
                             File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + "_decrypted.dat", DecryptedFile);
                         }
                     }
                     else if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".json")
                     {
+                        //Read the JSON input file
+                        string JSON = File.ReadAllText(FilePaths[CurrentFile], shiftJIS);
+
                         if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_sce"))
                         {
-                            string JSON = File.ReadAllText(FilePaths[CurrentFile], shiftJIS);
-                            Dat dat = new Dat();
-                            byte[] EncryptedFile = dat.Encrypt(dat.Compile(JSON));
+                            byte[] EncryptedFile = Dat.Encrypt(Sce.Compile(JSON));
                             File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".dat", EncryptedFile);
                         }
                     }
