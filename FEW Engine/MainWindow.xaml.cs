@@ -106,7 +106,10 @@ public partial class MainWindow : Window
                         }
                         else if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_define"))
                         {
-                            throw new NotImplementedException("The conversion from definition files to JSON is not implemented for this version of the tool.");
+                            byte[] Data = File.ReadAllBytes(FilePaths[CurrentFile]);
+                            Dat dat = new Dat();
+                            byte[] DecryptedFile = dat.Decrypt(Data);
+                            File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + "_decrypted.dat", DecryptedFile);
                         }
                     }
                     else if (System.IO.Path.GetExtension(FilePaths[CurrentFile]) == ".json")
