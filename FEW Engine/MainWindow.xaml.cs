@@ -122,6 +122,11 @@ public partial class MainWindow : Window
                             byte[] EncryptedFile = Dat.Encrypt(Sce.Compile(JSON));
                             File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".dat", EncryptedFile);
                         }
+                        else if (System.IO.Path.GetFileNameWithoutExtension(FilePaths[CurrentFile]).EndsWith("_define"))
+                        {
+                            byte[] EncryptedFile = Dat.Encrypt(Define.Compile(JSON));
+                            File.WriteAllBytes(ofd.FolderName + "\\" + FileNames[CurrentFile] + ".dat", EncryptedFile);
+                        }
                     }
                 }
                 Button_Convert.IsEnabled = false;
