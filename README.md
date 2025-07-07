@@ -2,8 +2,7 @@
 Tool that allows the modification of script files offered in ANIM and CROWD powered visual novels (created by [SIS Planning](http://www.hs-crowd.co.jp/)).
 
 ### Notes on its usage
-1. The tool has only been tested (and will NOT be tested with other games) with [Zetsuboushi](https://vndb.org/v3315). So, considering that this tool does a full recompilation of the script file, incompatibilities across the entire library of CROWD and ANIM games.
-2. The program will not decrypt the *_define.dat file, mostly because it has yet to be investigated, although the format seems to be pretty simple.
+The tool has only been tested (and will NOT be tested with other games) with [Zetsuboushi](https://vndb.org/v3315). So, considering that this tool does a full recompilation of the script file, incompatibilities across the entire library of CROWD and ANIM games.
 
 ### How are *_sce.dat files created?
 While the code also documents how these files are structured, here it is also the same information on a more accessible manner.
@@ -22,19 +21,24 @@ So, all in all, a script file is divided into 3 parts:
   * **Header**: Magic signature (4 bytes) + Key (16 bytes)
     * Magic signature: like with any format, these bytes represent the beginning of a specific file format.
     * Key: the key used to encrypt the file.
-  * **Script's logic**: Offset to label (4 bytes) + Offset of strings (4 bytes) + Offset of jump labels (4 bytes)
+  * **Offsets for all sections**: Offset to label (4 bytes) + Offset of strings (4 bytes) + Offset of jump labels (4 bytes)
   * **Bytecode section**: it includes each instruction of the script file.
-  * **Label section**: its actual functionality is unknown, but in the analyzed game is non-existent.
+  * **Label section**: its actual functionality is unknown, but in the analyzed game is never created.
   * **String section**: a list of all of the strings used in the game that are user-defined.
   * **Jump label section**: probably a list similar to the label section.
 
+### How are *_define.dat files created?
+While the code also documents how these files are structured, here it is also the same information on a more accessible manner.
+
+These files are way simpler than the script ones, they simply contain all of the bytecode for the instructions that have been written into it, nothing more. If it has any kind of structure, it is not know, but there does not seem to be any in particular, so it is fair to assume that the game expects a set of instructions in a specific order, hardcoded into the main executable most probably.
+In fact, most of the instructions don't seem to be utilized at all, just the one that defines the descriptions for each of the events present in the recollection room in-game.
     
 ### Can you confirm to me that your decompilation process works flawlessly?
 Honestly, no. The process of compilation destroys a lot of information, like for example where to know if the developer is using the _TakanoScript_ format or not, or even worse, if at any point in time is using instructions like "if" and "else", which basically requires you to track the same set of instructions as before but with the addition that you have to know at what level of if you are currently at, which is not possible to know.
 
 ### Hey! This program does not seem to work with my game? What gives?
 Quite a lot of progress has been made on understanding the game format. Since this project is mostly focused on the game mentioned earlier and just in case something may vary between games, the following files have been included in order help users understanding the engine's inner workings:
-- **Decompilation**: the engine opcodes are defined in the game executable. In this case, a .i64 file generated with IDA Pro 9.1 with a lot of the game's functions understood, and for the opcodes the function to look for has been called **CompileScript**. The cracked game executable has been included (a full retail copy is still needed to debug the game, but no to open the pseudocode decompilation) since the original executable is packed with a program called *SETTEC*, so using the cracked executable makes the job easier. This was done mostly by [Crsky](https://github.com/crskycode/).
+- **Decompilation**: the engine opcodes are defined in the game executable. In this case, a .i64 file generated with IDA Pro 9.1 with a lot of the game's functions understood, and for the opcodes the function to look for has been called **CompileScript**, and **CompileDefine**. The cracked game executable has been included (a full retail copy is still needed to debug the game, but no to open the pseudocode decompilation) since the original executable is packed with a DRM called [Alpha-DVD](https://www.discpartner.de/media/service/kopierschutz%20settec/Alpha_rom.PDF), so using the cracked executable makes the job possible. The initial investigation was done by [Crsky](https://github.com/crskycode/).
 - **Script**: the game's zet_sce.dat is the decrypted version of the original file.
 
 Something worthy mentioning regarding the analyzed game, the game offers two things that can help a tiny bit when debugging and understanding the game. If you launch the main program while adding as a parameter a specific number, you'll get the game running plus a debug window too:
@@ -45,4 +49,4 @@ Something worthy mentioning regarding the analyzed game, the game offers two thi
 
 Sadly, CROWD and ANIM have made a lot of changes in the engine (either in the past and in the future if we take our analyzed game as a point of reference), so there's no other option that to decompile your game's main executable of choice and try to find what instructions it is expecting and how each of them are structured.
 Thankfully, most of the structure seems to be mostly the same, so a lot of the work done here can be taken forward to make more games compatible with this tool.
-### ℹ️ Regardless of that, if you happen to want to edit the string list (and ONLY said list), just download [version 1](https://github.com/TheVNConnoisseur/FEW_Engine/releases/tag/1.0) of this tool, it works flawlessly for those purposes.
+### ℹ️ Regardless of that, if you happen to want to edit the string list (and ONLY said list), just download [version 1](https://github.com/TheVNConnoisseur/FEW_Engine/releases/tag/1.0) of this tool, it works flawlessly for those purposes, albeit with the limitations imposed by the script's file format.
