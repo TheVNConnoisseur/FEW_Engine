@@ -35,6 +35,89 @@ namespace FEW_Engine
                             instruction.Arguments.Add(String);
                             break;
                         }
+                    case 4:
+                        {
+                            instruction.Type = "SetMepachiTime"; //or SMTIME
+                            CurrentOffset += 4;
+
+                            for (int CurrentArgument = 0; CurrentArgument < 3; CurrentArgument++)
+                            {
+                                int ArgumentValue = BitConverter.ToInt32(Data, CurrentOffset);
+                                instruction.Arguments.Add(ArgumentValue.ToString());
+                                CurrentOffset += 4;
+                            }
+                            break;
+                        }
+                    case 5:
+                        {
+                            instruction.Type = "DebugCgList";
+                            CurrentOffset += 4;
+                            break;
+                        }
+                    case 7:
+                        {
+                            instruction.Type = "SetKutiGroup";
+                            CurrentOffset += 4;
+
+                            CurrentOffset += 4; //The next 4 bytes is always an incrementing value starting from 0, that indicates the number of group
+                            
+                            //It includes a null-terminated string
+                            string String = DecompilerHelper.ReadNullTerminatedString(Data, ref CurrentOffset, shiftJIS);
+                            instruction.Arguments.Add(String);
+                            break;
+                        }
+                    case 8:
+                        {
+                            instruction.Type = "SetFullGroup";
+                            CurrentOffset += 4;
+
+                            CurrentOffset += 4; //The next 4 bytes is always an incrementing value starting from 0, that indicates the number of group
+
+                            //It includes a null-terminated string
+                            string String = DecompilerHelper.ReadNullTerminatedString(Data, ref CurrentOffset, shiftJIS);
+                            instruction.Arguments.Add(String);
+                            break;
+                        }
+                    case 10:
+                        {
+                            instruction.Type = "SetLanguage";
+                            CurrentOffset += 4;
+
+                            int ArgumentValue = BitConverter.ToInt32(Data, CurrentOffset);
+                            instruction.Arguments.Add(ArgumentValue.ToString());
+                            CurrentOffset += 4;
+                            break;
+                        }
+                    case 11:
+                        {
+                            instruction.Type = "FlowXYSet";
+                            CurrentOffset += 4;
+
+                            for (int CurrentArgument = 0; CurrentArgument < 5; CurrentArgument++)
+                            {
+                                int ArgumentValue = BitConverter.ToInt32(Data, CurrentOffset);
+                                instruction.Arguments.Add(ArgumentValue.ToString());
+                                CurrentOffset += 4;
+                            }
+                            break;
+                        }
+                    case 12:
+                        {
+                            instruction.Type = "FlowTextSet";
+                            CurrentOffset += 4;
+
+                            int ArgumentValue = BitConverter.ToInt32(Data, CurrentOffset);
+                            instruction.Arguments.Add(ArgumentValue.ToString());
+                            CurrentOffset += 4;
+
+                            //It includes two null-terminated strings
+                            string String = DecompilerHelper.ReadNullTerminatedString(Data, ref CurrentOffset, shiftJIS);
+                            instruction.Arguments.Add(String);
+
+                            string String2 = DecompilerHelper.ReadNullTerminatedString(Data, ref CurrentOffset, shiftJIS);
+                            instruction.Arguments.Add(String2);
+                            break;
+                        }
                     case 14:
                         {
                             instruction.Type = "MemoryText";
@@ -50,9 +133,56 @@ namespace FEW_Engine
                             instruction.Arguments.Add(String2);
                             break;
                         }
+                    case 16:
+                        {
+                            instruction.Type = "SceneTest";
+                            CurrentOffset += 4;
+
+                            for (int CurrentArgument = 0; CurrentArgument < 5; CurrentArgument++)
+                            {
+                                int ArgumentValue = BitConverter.ToInt32(Data, CurrentOffset);
+                                instruction.Arguments.Add(ArgumentValue.ToString());
+                                CurrentOffset += 4;
+                            }
+
+                            //It includes two null-terminated strings
+                            string String = DecompilerHelper.ReadNullTerminatedString(Data, ref CurrentOffset, shiftJIS);
+                            instruction.Arguments.Add(String);
+                            break;
+                        }
+                    case 17:
+                        {
+                            instruction.Type = "fCgSetGrp";
+                            CurrentOffset += 4;
+
+                            int ArgumentValue = BitConverter.ToInt32(Data, CurrentOffset);
+                            instruction.Arguments.Add(ArgumentValue.ToString());
+                            CurrentOffset += 4;
+                            break;
+                        }
+                    case 18:
+                        {
+                            instruction.Type = "fcgSet";
+                            CurrentOffset += 4;
+
+                            //It includes a null-terminated string
+                            string String = DecompilerHelper.ReadNullTerminatedString(Data, ref CurrentOffset, shiftJIS);
+                            instruction.Arguments.Add(String);
+                            break;
+                        }
                     case 19:
                         {
                             instruction.Type = "SystemMode";
+                            CurrentOffset += 4;
+
+                            //It includes a null-terminated string
+                            string String = DecompilerHelper.ReadNullTerminatedString(Data, ref CurrentOffset, shiftJIS);
+                            instruction.Arguments.Add(String);
+                            break;
+                        }
+                    case 20:
+                        {
+                            instruction.Type = "MessageMode";
                             CurrentOffset += 4;
 
                             //It includes a null-terminated string
