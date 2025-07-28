@@ -2,7 +2,7 @@
 Tool that allows the modification of script files offered in ANIM and CROWD powered visual novels (created by [SIS Planning](http://www.hs-crowd.co.jp/)).
 
 ### Notes on its usage
-The tool has only been tested (and will NOT be tested with other games) with [Zetsuboushi](https://vndb.org/v3315). So, considering that this tool does a full recompilation of the script file, incompatibilities across the entire library of CROWD and ANIM games.
+The tool has only been tested (and will NOT be tested with other games) with [Zetsuboushi](https://vndb.org/v3315). So, considering that this tool does a full recompilation of the script file, incompatibilities across the entire library of CROWD and ANIM games will arise.
 
 ### How are *_sce.dat files created?
 While the code also documents how these files are structured, here it is also the same information on a more accessible manner.
@@ -34,11 +34,11 @@ These files are way simpler than the script ones, they simply contain all of the
 In fact, most of the instructions don't seem to be utilized at all, just the one that defines the descriptions for each of the events present in the recollection room in-game.
     
 ### Can you confirm to me that your decompilation process works flawlessly?
-Honestly, no. The process of compilation destroys a lot of information, like for example where to know if the developer is using the _TakanoScript_ format or not, or even worse, if at any point in time is using instructions like "if" and "else", which basically requires you to track the same set of instructions as before but with the addition that you have to know at what level of if you are currently at, which is not possible to know.
+Honestly, no. The process of compilation destroys a lot of information, like for example where to know if the developer is using the _TakanoScript_ format or not, or even worse, if at any point in time is using instructions like "if" and "else", which basically requires you to track the same set of instructions as before but with the addition that you have to know at what level of *if* you are currently at, which is not possible to know.
 
 ### Hey! This program does not seem to work with my game? What gives?
 Quite a lot of progress has been made on understanding the game format. Since this project is mostly focused on the game mentioned earlier and just in case something may vary between games, the following files have been included in order help users understanding the engine's inner workings:
-- **Decompilation**: the engine opcodes are defined in the game executable. In this case, a .i64 file generated with IDA Pro 9.1 with a lot of the game's functions understood, and for the opcodes the function to look for has been called **CompileScript**, and **CompileDefine**. The cracked game executable has been included (a full retail copy is still needed to debug the game, but no to open the pseudocode decompilation) since the original executable is packed with a DRM called [Alpha-DVD](https://www.discpartner.de/media/service/kopierschutz%20settec/Alpha_rom.PDF), so using the cracked executable makes the job possible. The initial investigation was done by [Crsky](https://github.com/crskycode/).
+- **Decompilation**: the engine opcodes are defined in the game executable. In this case, a .i64 file generated with IDA Pro 9.1 with a lot of the game's functions understood, and for the opcodes the function to look for has been called **CompileScript**, and **CompileDefine**. The cracked game executable has been included (a full retail copy is still needed to debug the game, but not to open the pseudocode decompilation) since the original executable is packed with a DRM called [Alpha-DVD](https://www.discpartner.de/media/service/kopierschutz%20settec/Alpha_rom.PDF), so using the cracked executable makes the job possible. The initial investigation was done by [Crsky](https://github.com/crskycode/).
 - **Script**: the game's zet_sce.dat is the decrypted version of the original file.
 
 Something worthy mentioning regarding the analyzed game, the game offers two things that can help a tiny bit when debugging and understanding the game. If you launch the main program while adding as a parameter a specific number, you'll get the game running plus a debug window too:
