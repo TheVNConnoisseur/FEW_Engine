@@ -50,7 +50,7 @@ namespace FEW_Engine
         }
 
         //Function that obtains the parameters given a data array.
-        //This function is also expected to be called given the proper context,
+        //This function is expected to be called given the proper context,
         //so the conditions must be before calling to ensure that there are no
         //issues.
         //In this case, there are two types of modes possible: strict mode and
@@ -117,7 +117,7 @@ namespace FEW_Engine
 
         //When parsing a file, all strings generally speaking are structured in a pretty basic way: an array of bytes
         //that are null terminated, indicating the end of the string. In this case, this function already updates the
-        //offset value for the actual byte arraye
+        //offset value for the actual byte array
         public static string ReadNullTerminatedString(byte[] Data, ref int Offset, Encoding Encoding)
         {
             int Start = Offset;
