@@ -31,7 +31,7 @@ So, all in all, a script file is divided into 3 parts:
 While the code also documents how these files are structured, here it is also the same information on a more accessible manner.
 
 These files are way simpler than the script ones, they simply contain all of the bytecode for the instructions that have been written into it, nothing more. If it has any kind of structure, it is not know, but there does not seem to be any in particular, so it is fair to assume that the game expects a set of instructions in a specific order, hardcoded into the main executable most probably.
-In fact, most of the instructions don't seem to be utilized at all, just the one that defines the descriptions for each of the events present in the recollection room in-game.
+In fact, most of the instructions don't seem to be utilized at all, just the one that defines the descriptions for each of the events present in the recollection room in-game, alongside if the product is the demo or the full release.
     
 ### Can you confirm to me that your decompilation process works flawlessly?
 Honestly, no. The process of compilation destroys a lot of information, like for example where to know if the developer is using the _TakanoScript_ format or not, or even worse, if at any point in time is using instructions like "if" and "else", which basically requires you to track the same set of instructions as before but with the addition that you have to know at what level of *if* you are currently at, which is not possible to know.

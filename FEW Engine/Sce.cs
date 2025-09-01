@@ -2760,16 +2760,16 @@ namespace FEW_Engine
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments.Add(strings[stringIndex]);
+                            int VoiceFileIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[VoiceFileIndex]);
                             currentOffset += 4;
 
-                            int stringIndex1 = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments.Add(strings[stringIndex1]);
+                            int CharacterNameIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[CharacterNameIndex]);
                             currentOffset += 4;
 
-                            int stringIndex2 = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments.Add(strings[stringIndex2]);
+                            int SentenceIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[SentenceIndex]);
                             currentOffset += 4;
 
                             currentOffset += 4; //These last 4 bytes are always an incrementing value, starting from 0
@@ -2785,12 +2785,12 @@ namespace FEW_Engine
                                     Convert.ToString(BitConverter.ToInt32(Data, currentOffset)));
                             currentOffset += 4;
 
-                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments.Add(strings[stringIndex]);
+                            int CharacterNameIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[CharacterNameIndex]);
                             currentOffset += 4;
 
-                            int stringIndex1 = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments.Add(strings[stringIndex1]);
+                            int SentenceIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[SentenceIndex]);
                             currentOffset += 4;
 
                             currentOffset += 4; //These last 4 bytes are always an incrementing value, starting from 0
@@ -2802,12 +2802,12 @@ namespace FEW_Engine
                             instruction.Type = "Dialogue"; //Unofficial name
                             currentOffset++; //There is no name for some instructions apparently, so we cannot name it
 
-                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments.Add(strings[stringIndex]);
+                            int CharacterNameIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[CharacterNameIndex]);
                             currentOffset += 4;
 
-                            int stringIndex1 = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments.Add(strings[stringIndex1]);
+                            int SentenceIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[SentenceIndex]);
                             currentOffset += 4;
 
                             currentOffset += 4; //These last 4 bytes are always an incrementing value, starting from 0
@@ -2819,8 +2819,8 @@ namespace FEW_Engine
                             instruction.Type = "Dialogue"; //Unofficial name
                             currentOffset++; //There is no name for some instructions apparently, so we cannot name it
 
-                            int stringIndex = BitConverter.ToInt32(Data, currentOffset);
-                            instruction.Arguments.Add(strings[stringIndex]);
+                            int SentenceIndex = BitConverter.ToInt32(Data, currentOffset);
+                            instruction.Arguments.Add(strings[SentenceIndex]);
                             currentOffset += 4;
 
                             currentOffset += 4; //These last 4 bytes are always an incrementing value, starting from 0
