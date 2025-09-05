@@ -28,11 +28,17 @@ So, all in all, a script file is divided into 3 parts:
   * **Jump label section**: probably a list similar to the label section.
 
 ### How are *_define.dat files created?
-While the code also documents how these files are structured, here it is also the same information on a more accessible manner.
+Like with the other file, while the code also documents how these files are structured, here it is also the same information on a more accessible manner.
 
 These files are way simpler than the script ones, they simply contain all of the bytecode for the instructions that have been written into it, nothing more. If it has any kind of structure, it is not know, but there does not seem to be any in particular, so it is fair to assume that the game expects a set of instructions in a specific order, hardcoded into the main executable most probably.
 In fact, most of the instructions don't seem to be utilized at all, just the one that defines the descriptions for each of the events present in the recollection room in-game, alongside if the product is the demo or the full release.
-    
+
+So, all in all, a define file is structured like this:
+  * **Header**: Magic signature (4 bytes) + Key (16 bytes)
+    * Magic signature: like with any format, these bytes represent the beginning of a specific file format.
+    * Key: the key used to encrypt the file.
+  * **Bytecode section**: it includes each instruction of the define file.
+
 ### Can you confirm to me that your decompilation process works flawlessly?
 Honestly, no. The process of compilation destroys a lot of information, like for example where to know if the developer is using the _TakanoScript_ format or not, or even worse, if at any point in time is using instructions like "if" and "else", which basically requires you to track the same set of instructions as before but with the addition that you have to know at what level of *if* you are currently at, which is not possible to know.
 
@@ -40,10 +46,11 @@ Honestly, no. The process of compilation destroys a lot of information, like for
 Quite a lot of progress has been made on understanding the game format. Since this project is mostly focused on the game mentioned earlier and just in case something may vary between games, the following files have been included in order help users understanding the engine's inner workings:
 - **Decompilation**: the engine opcodes are defined in the game executable. In this case, a .i64 file generated with IDA Pro 9.1 with a lot of the game's functions understood, and for the opcodes the function to look for has been called **CompileScript**, and **CompileDefine**. The cracked game executable has been included (a full retail copy is still needed to debug the game, but not to open the pseudocode decompilation) since the original executable is packed with a DRM called [Alpha-DVD](https://www.discpartner.de/media/service/kopierschutz%20settec/Alpha_rom.PDF), so using the cracked executable makes the job possible. The initial investigation was done by [Crsky](https://github.com/crskycode/).
 - **Script**: the game's zet_sce.dat is the decrypted version of the original file.
+- **Define:** the game's zet_define.dat is the decrypted version of the original file.
 
 Something worthy mentioning regarding the analyzed game, the game offers two things that can help a tiny bit when debugging and understanding the game. If you launch the main program while adding as a parameter a specific number, you'll get the game running plus a debug window too:
 - **1:** you'll get a window that tracks all of the flags and the sound files loaded for each BGM and SE available track.
-- **2:** it closes the game immediately (I'm not even sure if you need a file called modebug.bin or something, I can't confirm that part).
+- **2:** if some condition is met (which is not understood yet), the game will compile the script file (it has to be called *zet_sce.txt*), and it will report back any errors if there are any. After that, the game will close automatically.
 - **5:** it opens a window which said purpose is still unknown.
 - **6:** it combines the effects of parameters 1 and 5.
 
